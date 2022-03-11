@@ -31,57 +31,63 @@ namespace ft {
 
 		reverse_iterator(){};
 		explicit	reverse_iterator(RandIter x) : _current(x) {};
-		template < class RandIterOther >
-					reverse_iterator(const reverse_iterator<RandIterOther>& other) : _current(other.base()) {};
+		reverse_iterator(const reverse_iterator<RandIter>& other) : _current(other.base()) {};
 
 		RandIter	base() const { return _current; };
 
 		thisRef		operator*() const
-		{	RandIter tmp = _current;
-			return (*(--tmp));	};
+		{
+			RandIter tmp = _current;
+			return (*(--tmp));
+		};
 
-//		thisPtr		operator->() const
-//		{	return &**this;	}; todo : разобраться в thisType* == thisPtr ?
-		thisType*	operator->() const
-		{	return &**this;	};
+		thisPtr		operator->() const { return &**this; };
 
 		thisType&	operator++() // инкремент декрементирует тк у нас реверсивный указатель
-		{	--_current;
-			return *this; 	};
+		{
+			--_current;
+			return *this;
+		};
 
 		thisType	operator++(int)
-		{	thisType tmp = *this;
+		{
+			thisType tmp(this);
 			--_current;
-			return tmp; 	};
+			return tmp;
+		};
 
 		thisType&	operator--() // декремент инкрементирует тк у нас реверсивный указатель
-		{	++_current;
-			return *this;	};
+		{
+			++_current;
+			return *this;
+		};
 
 		thisType	operator--(int)
-		{	thisType tmp = *this;
+		{
+			thisType tmp = *this;
 			++_current;
-			return tmp;		};
+			return tmp;
+		};
 
-		bool	Eq(const thisType& y) const
-		{	return (_current == y.base());	};
+		bool	Eq(const thisType& y) const { return (_current == y.base()); };
 
 		thisType&	operator+=(thisDiff N)
-		{	_current -= N;
-			return *this;	};
+		{
+			_current -= N;
+			return *this;
+		};
 
-		thisType	operator+(thisDiff N) const
-		{	return (thisType(_current - N)); };
+		thisType	operator+(thisDiff N) const { return (thisType(_current - N)); };
 
 		thisType&	operator-=(thisDiff N)
-		{	_current += N;
-			return *this;	};
+		{
+			_current += N;
+			return *this;
+		};
 
-		thisType	operator-(thisDiff N) const
-		{	return (thisType(_current + N)); };
+		thisType	operator-(thisDiff N) const { return (thisType(_current + N)); };
 
-		thisRef 	operator[](thisDiff N) const
-		{	return *(*this + N);	};
+		thisRef 	operator[](thisDiff N) const { return *(*this + N);	};
 	};
 
 	template < class RandIter > inline
