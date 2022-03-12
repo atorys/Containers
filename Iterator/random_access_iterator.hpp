@@ -26,39 +26,74 @@ namespace ft {
 
 	protected:
 
-		thisPtr	_current;
+		thisPtr		_current;
 
 	public:
 
 		random_access_iterator(){};
 		explicit random_access_iterator(thisPtr x) : _current(x) {};
 		random_access_iterator(const random_access_iterator<RandIter>& other) : _current(other.base()) {};
+		virtual ~random_access_iterator(){};
 
 		thisPtr		base() const { return _current; };
 
+		thisType& 	operator=(const thisType& other)
+					{
+						if (this != &other)
+							_current = other.base();
+						return *this;
+					};
 		thisRef 	operator*() const { return *_current; };
 		thisPtr		operator->() const { return &**this; };
 		thisType&	operator++()
-		{
-			++_current;
-			return	*this;
-		};
+					{
+						++_current;
+						return	*this;
+					};
 		thisType	operator++(int)
-		{
-			thisType tmp(this);
-			++_current;
-			return tmp.base();
-		}
+					{
+						thisType tmp(this);
+						++_current;
+						return tmp;
+					}
 		thisType&	operator--()
-		{
-			--_current;
-			return *this;
-		}
+					{
+						--_current;
+						return *this;
+					}
 		thisType	operator--(int)
-		{
-			thisType tmp(this);
-			--_current;
-			return *tmp;
-		}
+					{
+						thisType tmp(this);
+						--_current;
+						return tmp;
+					}
+		thisType 	operator+(thisDiff N) const { return thisType (_current + N); };
+		thisType 	operator-(thisDiff N) const { return thisType (_current - N); };
+		thisType&	operator+=(thisDiff N)
+					{
+						_current += N;
+						return *this;
+					}
+		thisType&	operator-=(thisDiff N)
+					{
+						_current -= N;
+						return *this;
+					}
+		bool 		operator==(const thisType& other) const { return (_current == other.base()); };
+		bool 		operator==(int other) const { return (_current == (thisPtr)other); };
+		bool 		operator!=(const thisType& other) const { return (*this != other); };
+		bool 		operator>(const thisType& other) const { return (*this > other); };
+		bool 		operator<(const thisType& other) const { return (*this < other); }; // todo : 119 почему сравниваются ссылки
+		bool 		operator>=(const thisType& other) const { return (*this >= other); };
+		bool 		operator<=(const thisType& other) const { return (*this <= other); };
+		thisRef 	operator[](thisDiff N) { return *(*this + N); };
+		thisDiff 	operator-(const thisType& other) { return (_current - other.base());};
 	};
+
+	template < class RandIter > inline
+	random_access_iterator<RandIter>	operator+(typename iterator_traits<RandIter>::diffType N,
+													const random_access_iterator<RandIter>& x)
+	{
+		return (x + N);
+	}
 }

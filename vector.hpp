@@ -7,36 +7,33 @@
 
 #include <memory>
 #include "Iterator/iterator.hpp"
+#include "Iterator/random_access_iterator.hpp"
+#include "Iterator/reverse_iterator.hpp"
 
 namespace ft {
 
 	/*
-	 * template class VECTOR VAL
-	 */
-	template < class Type, class Alloc >
-	class	vectorVal {
-	protected:
-//		vectorVal(Alloc A = Alloc()) : _AVal(A) {};
-//		typedef typename A::templaterebind<Type>::other Alty;
-//		Alty	_AVal;
-	};
-
-	/*
 	 * template class VECTOR
 	 */
-	template < class Type, class Alloc = allocator<Type> >
-	class	vector : public vectorVal < Type, Alloc > {
+	template < class Type, class Alloc = std::allocator <Type> >
+	class	vector {
 	public:
-		typedef vector<Type, Alloc>				thisType;
-		typedef vectorVal<Type, Alloc>			thisBase;
-		typedef typename Alloc::size_type		sizeType;
-		typedef typename Alloc::difference_type	differType;
-		typedef typename Alloc::pointer			pointer;
-		typedef typename Alloc::const_pointer	pointerConst;
-		typedef typename Alloc::reference		reference;
-		typedef typename Alloc::const_reference	referenceConst;
-		typedef typename Alloc::value_type		valueType;
+		typedef vector <Type, Alloc>					thisType;
+		typedef typename Alloc::size_type				sizeType;
+		typedef typename Alloc::difference_type			diffType;
+		typedef typename Alloc::pointer					ptr;
+		typedef typename Alloc::const_pointer			ptrConst;
+		typedef typename Alloc::reference				ref;
+		typedef typename Alloc::const_reference			refConst;
+		typedef typename Alloc::value_type				valueType;
 
+		typedef random_access_iterator < RandIter <Type, diffType, ptr, ref> >				iterator;
+		typedef random_access_iterator < RandIter <Type, diffType, ptrConst, refConst> >	iteratorConst;
+		typedef reverse_iterator < iterator >												iteratorReverse;
+		typedef reverse_iterator < iteratorConst >											iteratorReverseConst;
+
+
+		vector() : {};
 	private:
 	};
 }

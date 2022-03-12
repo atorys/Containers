@@ -9,7 +9,8 @@
 namespace ft {
 
 	typedef long int	ptrdiff_t;
-    /*
+
+    /**
      * CATEGORY TAGS
      * пустые типы, используются для выбора алгоритмов
      */
@@ -21,7 +22,7 @@ namespace ft {
 	struct	Int_iterator_tag {};
 
 
-    /*
+    /**
      * template class ITERATOR
      */
         template <  class _Cat, class _Type, class _Diff = ptrdiff_t, class _Ptr = _Type*, class _Ref = _Type& >
