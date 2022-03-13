@@ -3,8 +3,7 @@
 // Created by atory on 3/9/22.
 //
 
-#ifndef CONTAINERS_ITERATOR_HPP
-#define CONTAINERS_ITERATOR_HPP
+#pragma once
 
 namespace ft {
 
@@ -25,14 +24,14 @@ namespace ft {
     /**
      * template class ITERATOR
      */
-        template <  class _Cat, class _Type, class _Diff = ptrdiff_t, class _Ptr = _Type*, class _Ref = _Type& >
+    template <  class Category, class Type, class Difference = ptrdiff_t, class Pointer = Type*, class Reference = Type& >
         struct  iterator {
         public:
-            typedef _Cat    iterCategory;
-            typedef _Type   valueType;
-            typedef _Diff   diffType;
-            typedef _Ptr    pointer;
-            typedef _Ref    reference;
+            typedef Category    	iterCategory;
+            typedef Type			valueType;
+            typedef Difference		diffType;
+            typedef Pointer			pointer;
+            typedef Reference		reference;
         };
 
         template < class Type, class Diff, class Ptr, class Ref >
@@ -77,5 +76,3 @@ namespace ft {
             typedef const Type&                     reference;
         };
 }
-
-#endif //CONTAINERS_ITERATOR_HPP

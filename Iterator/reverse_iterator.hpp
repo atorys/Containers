@@ -2,9 +2,7 @@
 // Created by atory on 3/10/22.
 //
 
-#ifndef CONTAINERS_REVERSE_ITERATOR_HPP
-#define CONTAINERS_REVERSE_ITERATOR_HPP
-
+#pragma once
 #include "iterator.hpp"
 
 namespace ft {
@@ -24,10 +22,10 @@ namespace ft {
 		RandIter	_current;
 
 	public:
-		typedef	typename iterator_traits<RandIter>::diffType	thisDiff;
-		typedef	typename iterator_traits<RandIter>::pointer 	thisPtr;
-		typedef	typename iterator_traits<RandIter>::reference	thisRef;
-		typedef reverse_iterator<RandIter>						thisType;
+		typedef	typename ft::iterator_traits<RandIter>::diffType	thisDiff;
+		typedef	typename ft::iterator_traits<RandIter>::pointer 	thisPtr;
+		typedef	typename ft::iterator_traits<RandIter>::reference	thisRef;
+		typedef reverse_iterator<RandIter>							thisType;
 
 		reverse_iterator(){};
 		explicit	reverse_iterator(RandIter x) : _current(x) {};
@@ -103,5 +101,3 @@ namespace ft {
 		return !(A.Eq(B));
 	}
 }
-
-#endif //CONTAINERS_REVERSE_ITERATOR_HPP

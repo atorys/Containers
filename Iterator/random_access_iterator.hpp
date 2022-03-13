@@ -3,7 +3,6 @@
 //
 
 #pragma once
-
 #include "iterator.hpp"
 
 namespace ft {
@@ -13,16 +12,16 @@ namespace ft {
 	 ****************************************/
 
 	template < class RandIter >
-	class	random_access_iterator : public ft::iterator  < typename iterator_traits<RandIter>::iterCategory,
-															typename iterator_traits<RandIter>::valueType,
-															typename iterator_traits<RandIter>::diffType,
-															typename iterator_traits<RandIter>::pointer,
-															typename iterator_traits<RandIter>::reference >
+	class	random_access_iterator : public ft::iterator  < typename ft::iterator_traits<RandIter>::iterCategory,
+															typename ft::iterator_traits<RandIter>::valueType,
+															typename ft::iterator_traits<RandIter>::diffType,
+															typename ft::iterator_traits<RandIter>::pointer,
+															typename ft::iterator_traits<RandIter>::reference >
 	{
-		typedef	typename iterator_traits<RandIter>::diffType	thisDiff;
-		typedef	typename iterator_traits<RandIter>::pointer 	thisPtr;
-		typedef	typename iterator_traits<RandIter>::reference 	thisRef;
-		typedef random_access_iterator<RandIter>				thisType;
+		typedef	typename ft::iterator_traits<RandIter>::diffType	thisDiff;
+		typedef	typename ft::iterator_traits<RandIter>::pointer 	thisPtr;
+		typedef	typename ft::iterator_traits<RandIter>::reference 	thisRef;
+		typedef random_access_iterator<RandIter>					thisType;
 
 	protected:
 

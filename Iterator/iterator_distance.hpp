@@ -2,9 +2,7 @@
 // Created by atory on 3/10/22.
 //
 
-#ifndef CONTAINERS_ITERATOR_DISTANCE_HPP
-#define CONTAINERS_ITERATOR_DISTANCE_HPP
-
+#pragma once
 #include "iterator.hpp"
 #include "iterator_category.hpp"
 
@@ -16,9 +14,9 @@ namespace ft {
 	 *************************************************/
 
 	template < class InIter > inline
-	typename iterator_traits <InIter>::diffType	distance(InIter first, InIter last)
+	typename ft::iterator_traits <InIter>::diffType	distance(InIter first, InIter last)
 	{
-		typename iterator_traits<InIter>::diffType N = 0;
+		typename ft::iterator_traits<InIter>::diffType N = 0;
 		distanceIterTag(first, last, N, ft::Iter_cat(first));
 		return (N);
 	}
@@ -59,5 +57,3 @@ namespace ft {
 		N += last - first;
 	}
 }
-
-#endif //CONTAINERS_ITERATOR_DISTANCE_HPP

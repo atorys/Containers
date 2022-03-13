@@ -2,9 +2,7 @@
 // Created by atory on 3/10/22.
 //
 
-#ifndef CONTAINERS_ITERATOR_CATEGORY_HPP
-#define CONTAINERS_ITERATOR_CATEGORY_HPP
-
+#pragma once
 #include "iterator.hpp"
 
 namespace ft {
@@ -15,7 +13,7 @@ namespace ft {
 	 *****************************************************/
 
 	template < class Cat, class Type, class Diff, class Ptr, class Ref > inline
-	Cat	Iter_cat(const iterator <Cat, Type, Diff, Ptr, Ref>&)
+	Cat	Iter_cat(const ft::iterator <Cat, Type, Diff, Ptr, Ref>&)
 	{
 		return (Cat()); // new object
 	}
@@ -84,5 +82,3 @@ namespace ft {
 			return (Int_iterator_tag());
 		}
 }
-
-#endif //CONTAINERS_ITERATOR_CATEGORY_HPP
