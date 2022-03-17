@@ -12,6 +12,7 @@ int main()
 	ft::vector<int>::iterator	iterator2;
 	ft::vector<int> vector(4, 15);
 	ft::vector<int> vector2(2);
+	ft::vector<int> vector3;
 
 	iterator = vector2.begin();
 	iterator2 = vector2.end();

@@ -38,7 +38,7 @@ namespace ft {
 		/**	Constructors
 		 * **********************************************/
 
-		vector() { Buy(0); } // 1) empty
+//		vector() { Buy(0); } // 1) empty
 		explicit	vector(const Alloc& A = Alloc()) : _allocator(A) { Buy(0); } // 2) allocator
 
 		explicit	vector(sizeType N) // 3) elem count
@@ -80,6 +80,30 @@ namespace ft {
 				}
 		~vector() { Clear(); }
 
+
+		/** Overloads
+		 *********************************************************/
+		thisType&	operator=(const thisType& other)
+		{
+			if (this == &other)
+				;
+			else if (other.size() == 0)
+				Clear();
+			else if (other.size() <= this->size()) {
+				ptr tmp_end = Copy(other.begin(), other.end(), this->_first);
+				Destroy(tmp_end, this->_last);
+				_last = _first + other.size();
+			}
+			else {
+				Destroy(_first, _last);
+				_allocator.deallocate(_first, _end - _first);
+				if (Buy(other.size()))
+					_last = Copy(other.begin(), other.end(), this->_first);
+			}
+			return *this;
+		};
+
+
 		/**	Methods
 		 **********************************************************/
 		sizeType	size() const { return _first == 0 ? 0 : _last - _first; }
@@ -116,27 +140,118 @@ namespace ft {
 		ref 		back() { return *(this->end() - 1); }
 		const_ref	back() const { return *(this->end() - 1); }
 
-		/** Overloads
-		 *********************************************************/
-		thisType&	operator=(const thisType& other)
+
+		void 	reserve(sizeType N)
 		{
-			if (this == &other)
+			if (this->max_size() < N)
+				exception_length();
+			if (this->capacity() < N)
+			{
+				ptr copy = _allocator.allocate(N, (void *)nullptr);
+				try {
+					Copy(this->begin(), this->end(), copy);
+				}
+				catch (...) {
+					_allocator.deallocate(copy, N);
+					throw ;
+				}
+				if (_first != 0)
+				{
+					Destroy(_first, _last);
+					_allocator.deallocate(_first, _end - _first);
+					_end = copy + N;
+					_last = copy + this->size();
+					_first = copy;
+				}
+			}
+		}
+
+		void	resize(sizeType N)
+		{
+			resize(N, Type());
+		}
+
+		void	resize(sizeType N, Type X)
+		{
+			if (this->size() < N)
+				insert(this->end(), N - this->size(), X);
+			else if (N < this->size())
+				erase(this->begin() + N, this->end());
+		}
+
+		template <class Iter>
+		void assign(Iter first, Iter last) { Assign(first, last, ft::Iter_cat(first)); }
+
+		template <class Iter>
+		void Assign(Iter first, Iter last, ft::Int_iterator_tag)
+		{
+			erase(this->begin(), this->end());
+			insert(this->begin(), first, last);
+		}
+
+		void assign(sizeType N, const Type& X)
+		{
+			Type Y = X;
+			erase(this->begin(), this->end());
+			insert(this->begin(), N, Y);
+		}
+
+		iterator	insert(iterator p, const Type& X)
+		{
+			sizeType off = this->size() == 0 ? 0 : p - this->begin();
+			insert(p, (sizeType)1, X);
+			return (this->begin() + off);
+		}
+
+		void 	insert(iterator p, sizeType M, const Type& X)
+		{
+			Type		Y = X;
+			sizeType	N = this->capacity();
+			if (M == 0)
 				;
-			else if (other.size() == 0)
-				Clear();
-			else if (other.size() <= this->size()) {
-				ptr tmp_end = Copy(other.begin(), other.end(), this->_first);
-				Destroy(tmp_end, this->_last);
-				_last = _first + other.size();
+			else if (this->max_size() - this->size() < M)
+				exception_length();
+			else if (N < this->size() + M) {
+				N = this->max_size() - N / 2 < N ? 0 : N + N/2;
+				if (N < this->size() + M)
+					N = this->size() + M;
+				ptr S = _allocator.allocate(N, (void *)nullptr);
+				ptr Q;
+				try {
+					Q = Copy(this->begin(), p, S);
+					Q = Fill(Q, M, Y);
+					Copy(p, this->end(), Q);
+				}
+				catch (...){
+					Destroy(S, Q);
+					_allocator.deallocate(S, N);
+					throw ;
+				}
+				if (_first != 0) {
+					Destroy(_first, _last);
+					_allocator.deallocate(_first, _end - _first);
+				}
+				_end = S + N;
+				_last = S + this->size() + M;
+				_first = S;
+			}
+			else if ((sizeType)(this->end() - p) < M) {
+				Copy(p, this->end(), p.base() + M);
+				try {
+					Fill(_last, M - (this->end() - p), Y);
+				}
+				catch (...) {
+					Destroy(p.base() + M, _last + M);
+					throw ;
+				}
+				_last += M;
+				ft::fill(p, this->end() - M, Y);
 			}
 			else {
-				Destroy(_first, _last);
-				_allocator.deallocate(_first, _end - _first);
-				if (Buy(other.size()))
-					_last = Copy(other.begin(), other.end(), this->_first);
+				iterator End = this->end();
+
 			}
-			return *this;
-		};
+		}
 
 
 	protected:
