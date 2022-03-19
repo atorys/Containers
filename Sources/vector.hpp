@@ -105,160 +105,169 @@ namespace ft {
 
 
 		/**	Methods
-		 **********************************************************/
-		sizeType	size() const { return _first == 0 ? 0 : _last - _first; }
-		sizeType 	max_size() const { return _allocator.max_size(); }
-		sizeType 	capacity() const { return (_first == 0 ? 0 : _end - _first); }
-		bool		empty() const { return (this->size() == 0); }
-		Alloc		get_allocator() const { return _allocator; }
+		 **********************************************************************************************/
+		sizeType				size() const			{ return _first == NULL ? 0 : _last - _first; }
+		sizeType				max_size() const		{ return _allocator.max_size(); }
+		sizeType				capacity() const		{ return (_first == NULL ? 0 : _end - _first); }
+		bool					empty() const			{ return (this->size() == 0); }
+		Alloc					get_allocator() const	{ return _allocator; }
 
-		iterator				begin() { return iterator(_first); }
-		const_iterator			begin() const { return const_iterator(_first); }
-		iterator				end() { return iterator(_last); }
-		const_iterator			end() const { return const_iterator(_last); }
-		reverse_iterator		rbegin() { return reverse_iterator(this->end()); }
-		const_reverse_iterator	rbegin() const { return const_reverse_iterator(this->end()); }
-		reverse_iterator		rend() { return reverse_iterator(this->begin()); }
-		const_reverse_iterator	rend() const { return const_reverse_iterator(this->begin()); }
+		iterator				begin()					{ return iterator(_first); }
+		const_iterator			cbegin() const			{ return const_iterator(_first); }
+		iterator				end()					{ return iterator(_last); }
+		const_iterator			cend() const			{ return const_iterator(_last); }
+		reverse_iterator		rbegin()				{ return reverse_iterator(this->end()); }
+		const_reverse_iterator	crbegin() const			{ return const_reverse_iterator(this->end()); }
+		reverse_iterator		rend()					{ return reverse_iterator(this->begin()); }
+		const_reverse_iterator	crend() const			{ return const_reverse_iterator(this->begin()); }
 
-		ref			at(sizeType N)
+		const_ref				operator[](sizeType N) const	{ return *(this->begin() + N); }
+		ref						operator[](sizeType N)			{ return *(this->begin() + N); }
+		ref 					front()							{ return *(this->begin()); }
+		const_ref				front() const					{ return *(this->begin()); }
+		ref 					back()							{ return *(this->end() - 1); }
+		const_ref				back() const					{ return *(this->end() - 1); }
+
+		ref			at(sizeType N) throw(std::out_of_range)
 		{
 			if (this->size() <= N)
 				exception_range();
 			return *(this->begin() + N);
 		}
-		const_ref	at(sizeType N) const
+		const_ref	at(sizeType N) const throw(std::out_of_range)
 		{
 			if (this->size() <= N)
 				exception_range();
 			return *(this->begin() + N);
 		}
-		const_ref 	operator[](sizeType N) const { return *(this->begin() + N); }
-		ref			operator[](sizeType N) { return *(this->begin() + N); }
-		ref 		front() { return *(this->begin()); }
-		const_ref	front() const { return *(this->begin()); }
-		ref 		back() { return *(this->end() - 1); }
-		const_ref	back() const { return *(this->end() - 1); }
 
 
-		void 	reserve(sizeType N)
+//		void 	reserve(sizeType N)
+//		{
+//			if (this->max_size() < N)
+//				exception_length();
+//			if (this->capacity() < N)
+//			{
+//				ptr copy = _allocator.allocate(N, (void *)nullptr);
+//				try {
+//					Copy(this->begin(), this->end(), copy);
+//				}
+//				catch (...) {
+//					_allocator.deallocate(copy, N);
+//					throw ;
+//				}
+//				if (_first != 0)
+//				{
+//					Destroy(_first, _last);
+//					_allocator.deallocate(_first, _end - _first);
+//					_end = copy + N;
+//					_last = copy + this->size();
+//					_first = copy;
+//				}
+//			}
+//		}
+//
+//		void	resize(sizeType N)
+//		{
+//			resize(N, Type());
+//		}
+//
+//		void	resize(sizeType N, Type X)
+//		{
+//			if (this->size() < N)
+//				insert(this->end(), N - this->size(), X);
+//			else if (N < this->size())
+//				erase(this->begin() + N, this->end());
+//		}
+//
+//		template <class Iter>
+//		void assign(Iter first, Iter last) { Assign(first, last, ft::Iter_cat(first)); }
+//
+//		template <class Iter>
+//		void Assign(Iter first, Iter last, ft::Int_iterator_tag)
+//		{
+//			erase(this->begin(), this->end());
+//			insert(this->begin(), first, last);
+//		}
+//
+//		void assign(sizeType N, const Type& X)
+//		{
+//			Type Y = X;
+//			erase(this->begin(), this->end());
+//			insert(this->begin(), N, Y);
+//		}
+
+		/** Insert
+		*******************/
+		iterator	insert(iterator position, const Type& X) throw(std::length_error)
 		{
-			if (this->max_size() < N)
+			sizeType offsetIndex = this->size() == 0 ? 0 : position - this->begin();
+			this->insert(position, (sizeType)1, X);
+			return (this->begin() + offsetIndex);
+		}
+
+		// inserts n values before position
+		void 	insert(iterator position, sizeType N, const Type& X) throw(std::length_error)
+		{
+			if (N == 0)
+				return ;
+			if (this->max_size() - this->size() < N)
 				exception_length();
-			if (this->capacity() < N)
-			{
-				ptr copy = _allocator.allocate(N, (void *)nullptr);
-				try {
-					Copy(this->begin(), this->end(), copy);
-				}
-				catch (...) {
-					_allocator.deallocate(copy, N);
-					throw ;
-				}
-				if (_first != 0)
-				{
-					Destroy(_first, _last);
-					_allocator.deallocate(_first, _end - _first);
-					_end = copy + N;
-					_last = copy + this->size();
-					_first = copy;
-				}
-			}
-		}
 
-		void	resize(sizeType N)
-		{
-			resize(N, Type());
-		}
-
-		void	resize(sizeType N, Type X)
-		{
-			if (this->size() < N)
-				insert(this->end(), N - this->size(), X);
-			else if (N < this->size())
-				erase(this->begin() + N, this->end());
-		}
-
-		template <class Iter>
-		void assign(Iter first, Iter last) { Assign(first, last, ft::Iter_cat(first)); }
-
-		template <class Iter>
-		void Assign(Iter first, Iter last, ft::Int_iterator_tag)
-		{
-			erase(this->begin(), this->end());
-			insert(this->begin(), first, last);
-		}
-
-		void assign(sizeType N, const Type& X)
-		{
-			Type Y = X;
-			erase(this->begin(), this->end());
-			insert(this->begin(), N, Y);
-		}
-
-		iterator	insert(iterator p, const Type& X)
-		{
-			sizeType off = this->size() == 0 ? 0 : p - this->begin();
-			insert(p, (sizeType)1, X);
-			return (this->begin() + off);
-		}
-
-		void 	insert(iterator p, sizeType M, const Type& X)
-		{
-			Type		Y = X;
-			sizeType	N = this->capacity();
-			if (M == 0)
-				;
-			else if (this->max_size() - this->size() < M)
-				exception_length();
-			else if (N < this->size() + M) {
-				N = this->max_size() - N / 2 < N ? 0 : N + N/2;
-				if (N < this->size() + M)
-					N = this->size() + M;
-				ptr S = _allocator.allocate(N, (void *)nullptr);
-				ptr Q;
-				try {
-					Q = Copy(this->begin(), p, S);
-					Q = Fill(Q, M, Y);
-					Copy(p, this->end(), Q);
-				}
-				catch (...){
-					Destroy(S, Q);
-					_allocator.deallocate(S, N);
-					throw ;
-				}
-				if (_first != 0) {
-					Destroy(_first, _last);
-					_allocator.deallocate(_first, _end - _first);
-				}
-				_end = S + N;
-				_last = S + this->size() + M;
-				_first = S;
-			}
-			else if ((sizeType)(this->end() - p) < M) {
-				Copy(p, this->end(), p.base() + M);
-				try {
-					Fill(_last, M - (this->end() - p), Y);
-				}
-				catch (...) {
-					Destroy(p.base() + M, _last + M);
-					throw ;
-				}
-				_last += M;
-				ft::fill(p, this->end() - M, Y);
-			}
-			else {
-				iterator End = this->end();
-
-			}
+//			Type		Y = X;
+//			sizeType	N = this->capacity();
+//			if (M == 0)
+//				;
+//			else if (this->max_size() - this->size() < M)
+//				exception_length();
+//			else if (N < this->size() + M) {
+//				N = this->max_size() - N / 2 < N ? 0 : N + N/2;
+//				if (N < this->size() + M)
+//					N = this->size() + M;
+//				ptr S = _allocator.allocate(N, (void *)nullptr);
+//				ptr Q;
+//				try {
+//					Q = Copy(this->begin(), p, S);
+//					Q = Fill(Q, M, Y);
+//					Copy(p, this->end(), Q);
+//				}
+//				catch (...){
+//					Destroy(S, Q);
+//					_allocator.deallocate(S, N);
+//					throw ;
+//				}
+//				if (_first != 0) {
+//					Destroy(_first, _last);
+//					_allocator.deallocate(_first, _end - _first);
+//				}
+//				_end = S + N;
+//				_last = S + this->size() + M;
+//				_first = S;
+//			}
+//			else if ((sizeType)(this->end() - p) < M) {
+//				Copy(p, this->end(), p.base() + M);
+//				try {
+//					Fill(_last, M - (this->end() - p), Y);
+//				}
+//				catch (...) {
+//					Destroy(p.base() + M, _last + M);
+//					throw ;
+//				}
+//				_last += M;
+//				ft::fill(p, this->end() - M, Y);
+//			}
+//			else {
+//				iterator End = this->end();
+//
+//			}
 		}
 
 
 	protected:
 		Alloc	_allocator;
-		ptr		_first;
-		ptr		_last;
-		ptr		_end;
+		ptr		_first; // HEAD
+		ptr		_last;	// TAIL
+		ptr		_end;	// END of allocated memory
 
 		/* uses allocator "Alloc" to allocate N * sizeof(Alloc::value_type)
 		 * bytes of uninitialized storage
@@ -272,7 +281,7 @@ namespace ft {
 			if (N == 0)
 				return false;
 			_first = _allocator.allocate(N, (void *)nullptr); // number of objects, ptr to nearby memory location
-			_last = _first;
+			_last = _first; // means np elements constructed yet
 			_end = _first + N;
 			return true;
 		};
