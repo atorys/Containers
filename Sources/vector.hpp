@@ -36,8 +36,7 @@ namespace ft {
 
 
 		/**	Constructors
-		 * **********************************************/
-
+		 ************************************************/
 //		vector() { Buy(0); } // 1) empty
 		explicit	vector(const Alloc& A = Alloc()) : _allocator(A) { Buy(0); } // 2) allocator
 
@@ -213,53 +212,9 @@ namespace ft {
 				return ;
 			if (this->max_size() - this->size() < N)
 				exception_length();
-
-//			Type		Y = X;
-//			sizeType	N = this->capacity();
-//			if (M == 0)
-//				;
-//			else if (this->max_size() - this->size() < M)
-//				exception_length();
-//			else if (N < this->size() + M) {
-//				N = this->max_size() - N / 2 < N ? 0 : N + N/2;
-//				if (N < this->size() + M)
-//					N = this->size() + M;
-//				ptr S = _allocator.allocate(N, (void *)nullptr);
-//				ptr Q;
-//				try {
-//					Q = Copy(this->begin(), p, S);
-//					Q = Fill(Q, M, Y);
-//					Copy(p, this->end(), Q);
-//				}
-//				catch (...){
-//					Destroy(S, Q);
-//					_allocator.deallocate(S, N);
-//					throw ;
-//				}
-//				if (_first != 0) {
-//					Destroy(_first, _last);
-//					_allocator.deallocate(_first, _end - _first);
-//				}
-//				_end = S + N;
-//				_last = S + this->size() + M;
-//				_first = S;
-//			}
-//			else if ((sizeType)(this->end() - p) < M) {
-//				Copy(p, this->end(), p.base() + M);
-//				try {
-//					Fill(_last, M - (this->end() - p), Y);
-//				}
-//				catch (...) {
-//					Destroy(p.base() + M, _last + M);
-//					throw ;
-//				}
-//				_last += M;
-//				ft::fill(p, this->end() - M, Y);
-//			}
-//			else {
-//				iterator End = this->end();
-//
-//			}
+			if (this->size() + N >= this->capacity()) {
+				reserve(this->capacity() + N);
+			}
 		}
 
 
