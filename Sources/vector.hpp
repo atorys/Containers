@@ -12,9 +12,16 @@
 
 namespace ft {
 
-	/*************************
+	/**
 	 * template class VECTOR
-	 *************************/
+	 * Sequence container representing dynamic array
+	 *
+	 * May allocate some extra storage to accommodate for possible growth
+	 * Elements are accessed by their position in the sequence
+	 *
+	 * ! If a reallocation happens, all iterators/pointers/references
+	 * pointing to position and beyond are invalid !
+	 */
 
 	template < class Type, class Alloc = std::allocator <Type> >
 	class	vector {
@@ -34,28 +41,28 @@ namespace ft {
 		typedef ft::reverse_iterator < iterator >												reverse_iterator;
 		typedef ft::reverse_iterator < const_iterator >											const_reverse_iterator;
 
-
 		/**	Constructors
-		 ************************************************/
-//		vector() { Buy(0); } // 1) empty
-		explicit	vector(const Alloc& A = Alloc()) : _allocator(A) { Buy(0); } // 2) allocator
+		 *********************************************************/
+//		vector() { Buy(0); }
+		explicit	vector(const Alloc& A = Alloc()) : _allocator(A) { Buy(0); }
 
-		explicit	vector(sizeType N) // 3) elem count
+		explicit	vector(sizeType N)
 		{
 			if (Buy(N))
 				_last = Fill(_first, N, Type());
 		}
 
-		vector(sizeType N, const Type& X) { // 4) count, object sample
+		vector(sizeType N, const Type& X) {
 			if (Buy(N))
 				_last = Fill(_first, N, X);
 		}
-		vector(sizeType N, const Type& X, const Alloc& A = Alloc()) : _allocator(A) // 5) count, object sample, allocator
+		vector(sizeType N, const Type& X, const Alloc& A = Alloc()) : _allocator(A)
 		{
 			if (Buy(N))
 				_last = Fill(_first, N, X);
 		}
-		vector(const thisType& other) // 6) copy constructor
+		// copy constructor
+		vector(const thisType& other)
 		{
 			if (Buy(other.size()))
 				_last = Copy(other.begin(), other.end(), _first);
@@ -79,35 +86,11 @@ namespace ft {
 				}
 		~vector() { Clear(); }
 
-
-		/** Overloads
-		 *********************************************************/
-		thisType&	operator=(const thisType& other)
-		{
-			if (this == &other)
-				;
-			else if (other.size() == 0)
-				Clear();
-			else if (other.size() <= this->size()) {
-				ptr tmp_end = Copy(other.begin(), other.end(), this->_first);
-				Destroy(tmp_end, this->_last);
-				_last = _first + other.size();
-			}
-			else {
-				Destroy(_first, _last);
-				_allocator.deallocate(_first, _end - _first);
-				if (Buy(other.size()))
-					_last = Copy(other.begin(), other.end(), this->_first);
-			}
-			return *this;
-		};
-
-
 		/**	Methods
 		 **********************************************************************************************/
-		sizeType				size() const			{ return _first == NULL ? 0 : _last - _first; }
-		sizeType				max_size() const		{ return _allocator.max_size(); }
-		sizeType				capacity() const		{ return (_first == NULL ? 0 : _end - _first); }
+		sizeType				size() const			{ return _first == NULL ? 0 : _last - _first; } // size of active array
+		sizeType				max_size() const		{ return _allocator.max_size(); } // size of max allocation
+		sizeType				capacity() const		{ return (_first == NULL ? 0 : _end - _first); } // size of allocated array
 		bool					empty() const			{ return (this->size() == 0); }
 		Alloc					get_allocator() const	{ return _allocator; }
 
@@ -139,6 +122,29 @@ namespace ft {
 				exception_range();
 			return *(this->begin() + N);
 		}
+
+		/** Overloads
+		 *********************************************************/
+		thisType&	operator=(const thisType& other)
+		{
+			if (this == &other)
+				;
+			else if (other.size() == 0)
+				Clear();
+			else if (other.size() <= this->size()) {
+				ptr tmp_end = std::copy(other.begin(), other.end(), _first);
+				Destroy(tmp_end, this->_last);
+				_last = _first + other.size();
+			}
+			else {
+				Destroy(_first, _last);
+				_allocator.deallocate(_first, _end - _first);
+				if (Buy(other.size()))
+					_last = Copy(other.begin(), other.end(), this->_first);
+			}
+			return *this;
+		};
+
 
 
 //		void 	reserve(sizeType N)
@@ -198,6 +204,7 @@ namespace ft {
 
 		/** Insert
 		*******************/
+		// single element
 		iterator	insert(iterator position, const Type& X) throw(std::length_error)
 		{
 			sizeType offsetIndex = this->size() == 0 ? 0 : position - this->begin();
@@ -205,23 +212,118 @@ namespace ft {
 			return (this->begin() + offsetIndex);
 		}
 
-		// inserts n values before position
-		void 	insert(iterator position, sizeType N, const Type& X) throw(std::length_error)
+		// fill : inserts count values before position
+		void 	insert(iterator position, sizeType count, const Type& X) throw(std::length_error)
 		{
-			if (N == 0)
+			sizeType	N = this->capacity();
+			ptr			newFirst;
+			ptr			newLast;
+
+			if (count == 0)
 				return ;
-			if (this->max_size() - this->size() < N)
+			if (this->max_size() - this->size() < count)
 				exception_length();
-			if (this->size() + N >= this->capacity()) {
-				reserve(this->capacity() + N);
+			// if capacity < needed space
+			else if (this->size() + count >= this->capacity()) {
+				// calculate needed capacity to allocate
+				N = (this->max_size() - N/2 < N) ? 0 : N + N/2;
+				if (this->size() + count >= N)
+					N = this->size() + count;
+
+				newFirst = _allocator.allocate(N, (void *)nullptr); // allocate bigger memory storage
+				try {
+					newLast = Copy(this->begin(), position, newFirst); // copy elements before position in new storage
+					newLast = Fill(newLast, count, X); // fill memory with new elements in range [position; position + count]
+					Copy(position, this->end(), newLast); // copy tail after position + count
+				}
+				catch (...) {
+					Destroy(newFirst, newLast);
+					_allocator.deallocate(newFirst, newLast);
+					throw ;
+				}
+				if (_first != nullptr)
+					Clear(); // free unused memory
+				_first = newFirst;
+				_last = newFirst + this->size() + count;
+				_end = newFirst + N; // new_first + new_capacity();
 			}
+			//
+			else if (this->end() - position < count) {
+				// смещаем элементы с [position; end] на [position + count; end]
+				// чтобы вставить новые и не потерять старые значения
+				Copy(position, this->end(), position.base() + count);
+				//
+				try {
+					Fill(_last, count - (this->end() - position), X);
+				}
+				catch (...) {
+					Destroy(position.base() + count, _last + count);
+					throw ;
+				}
+				_last += count;
+				std::fill(position, this->end() - count, X);
+			}
+			else { // if current capacity is enough
+				iterator	newEnd = this->end();
+
+				_last = Copy(newEnd - count, newEnd, _last);
+				std::copy_backward(position, newEnd - count, newEnd);
+				std::fill(position, position + count, X);
+			}
+		}
+
+		template < class Iter >
+		void	insert(iterator position, Iter First, Iter Last)
+		{
+			Insert(position, First, Last, ft::Iter_cat(First));
+		}
+
+		template < class Iter >
+		void	Insert(iterator position, Iter First, Iter Last, ft::Int_iterator_tag) {
+			insert(position, (sizeType)First, (Type)Last);
+		}
+		template < class Iter >
+		void	Insert(iterator position, Iter First, Iter Last, ft::input_iterator_tag) {
+			for (; First != Last; ++First, ++position)
+				position = insert(position, *First);
+		}
+		template < class Iter >
+		void	Insert(iterator position, Iter First, Iter Last, ft::forward_iterator_tag) {
+			// (. . .)
+		}
+
+		/** Erase
+		 *******************/
+		iterator	erase(iterator position)
+		{
+			 // todo: копирование без конструктора !!!
+			std::copy(position + 1, this->end(), position);
+			Destroy(_last - 1, _last);
+			--_last;
+			return position;
+		}
+		iterator	erase(iterator First, iterator Last)
+		{
+			if (First != Last) {
+				ptr	newLast = std::copy(Last, this->end(), First.base());
+				Destroy(newLast, _last);
+				_last = newLast;
+			}
+			return First;
+		}
+
+		/** Clear
+		 *******************/
+		void	clear()
+		{
+			erase(this->begin(), this->end());
 		}
 
 
 	protected:
 		Alloc	_allocator;
 		ptr		_first; // HEAD
-		ptr		_last;	// TAIL
+		ptr		_last;	// TAIL : position AFTER last active element if _first != 0
 		ptr		_end;	// END of allocated memory
 
 		/* uses allocator "Alloc" to allocate N * sizeof(Alloc::value_type)
@@ -241,14 +343,14 @@ namespace ft {
 			return true;
 		};
 
-		/* calls the destructor of the object pointed by given ptr */
+		/* calls the destructor of the elements in the array [first, last) */
 		void 	Destroy(ptr first, ptr last)
 		{
 			for (; first != last; first++)
 				_allocator.destroy(first);
 		};
 
-		/* destroying pointers and deallocating memory */
+		/* destroying whole array from the storage, pointers and deallocating memory */
 		void	Clear()
 		{
 			if (_first != nullptr) {
