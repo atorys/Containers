@@ -9,6 +9,7 @@
 #include "Iterator/iterator_category.hpp"
 #include "Iterator/random_access_iterator.hpp"
 #include "Iterator/reverse_iterator.hpp"
+#include "Utils/fill.hpp"
 
 namespace ft {
 
@@ -65,7 +66,7 @@ namespace ft {
 		vector(const thisType& other)
 		{
 			if (Buy(other.size()))
-				_last = Copy(other.begin(), other.end(), _first);
+				_last = Copy(other.cbegin(), other.cend(), _first);
 		}
 
 		template < class Iter >
@@ -99,9 +100,9 @@ namespace ft {
 		iterator				end()					{ return iterator(_last); }
 		const_iterator			cend() const			{ return const_iterator(_last); }
 		reverse_iterator		rbegin()				{ return reverse_iterator(this->end()); }
-		const_reverse_iterator	crbegin() const			{ return const_reverse_iterator(this->end()); }
+		const_reverse_iterator	rbegin() const			{ return const_reverse_iterator(this->end()); }
 		reverse_iterator		rend()					{ return reverse_iterator(this->begin()); }
-		const_reverse_iterator	crend() const			{ return const_reverse_iterator(this->begin()); }
+		const_reverse_iterator	rend() const			{ return const_reverse_iterator(this->begin()); }
 
 		const_ref				operator[](sizeType N) const	{ return *(this->begin() + N); }
 		ref						operator[](sizeType N)			{ return *(this->begin() + N); }
@@ -132,7 +133,7 @@ namespace ft {
 			else if (other.size() == 0)
 				Clear();
 			else if (other.size() <= this->size()) {
-				ptr tmp_end = std::copy(other.begin(), other.end(), _first);
+				ptr tmp_end = std::copy(other.cbegin(), other.cend(), _first);
 				Destroy(tmp_end, this->_last);
 				_last = _first + other.size();
 			}
@@ -140,67 +141,10 @@ namespace ft {
 				Destroy(_first, _last);
 				_allocator.deallocate(_first, _end - _first);
 				if (Buy(other.size()))
-					_last = Copy(other.begin(), other.end(), this->_first);
+					_last = Copy(other.cbegin(), other.cend(), this->_first);
 			}
 			return *this;
 		};
-
-
-
-//		void 	reserve(sizeType N)
-//		{
-//			if (this->max_size() < N)
-//				exception_length();
-//			if (this->capacity() < N)
-//			{
-//				ptr copy = _allocator.allocate(N, (void *)nullptr);
-//				try {
-//					Copy(this->begin(), this->end(), copy);
-//				}
-//				catch (...) {
-//					_allocator.deallocate(copy, N);
-//					throw ;
-//				}
-//				if (_first != 0)
-//				{
-//					Destroy(_first, _last);
-//					_allocator.deallocate(_first, _end - _first);
-//					_end = copy + N;
-//					_last = copy + this->size();
-//					_first = copy;
-//				}
-//			}
-//		}
-//
-//		void	resize(sizeType N)
-//		{
-//			resize(N, Type());
-//		}
-//
-//		void	resize(sizeType N, Type X)
-//		{
-//			if (this->size() < N)
-//				insert(this->end(), N - this->size(), X);
-//			else if (N < this->size())
-//				erase(this->begin() + N, this->end());
-//		}
-//
-//		template <class Iter>
-//		void assign(Iter first, Iter last) { Assign(first, last, ft::Iter_cat(first)); }
-//
-//		template <class Iter>
-//		void Assign(Iter first, Iter last, ft::Int_iterator_tag)
-//		{
-//			erase(this->begin(), this->end());
-//			insert(this->begin(), first, last);
-//		}
-//
-//		void assign(sizeType N, const Type& X)
-//		{
-//			Type Y = X;
-//			erase(this->begin(), this->end());
-//			insert(this->begin(), N, Y);
-//		}
 
 		/** Insert
 		*******************/
@@ -238,14 +182,16 @@ namespace ft {
 				}
 				catch (...) {
 					Destroy(newFirst, newLast);
-					_allocator.deallocate(newFirst, newLast);
+					_allocator.deallocate(newFirst, N);
 					throw ;
 				}
-				if (_first != nullptr)
-					Clear(); // free unused memory
-				_first = newFirst;
+				if (_first != nullptr) { // free unused memory
+					Destroy(_first, _last);
+					_allocator.deallocate(_first, _end - _first);
+				}
 				_last = newFirst + this->size() + count;
 				_end = newFirst + N; // new_first + new_capacity();
+				_first = newFirst;
 			}
 			//
 			else if (this->end() - position < count) {
@@ -261,14 +207,14 @@ namespace ft {
 					throw ;
 				}
 				_last += count;
-				std::fill(position, this->end() - count, X);
+				ft::fill(position, this->end() - count, X);
 			}
 			else { // if current capacity is enough
 				iterator	newEnd = this->end();
 
 				_last = Copy(newEnd - count, newEnd, _last);
 				std::copy_backward(position, newEnd - count, newEnd);
-				std::fill(position, position + count, X);
+				ft::fill(position, position + count, X);
 			}
 		}
 
@@ -304,9 +250,9 @@ namespace ft {
 		}
 		iterator	erase(iterator First, iterator Last)
 		{
-			if (First != Last) {
+			if (First != Last) { // active elements offset from [Last; End()] to First
 				ptr	newLast = std::copy(Last, this->end(), First.base());
-				Destroy(newLast, _last);
+				Destroy(newLast, _last); // erasing tail
 				_last = newLast;
 			}
 			return First;
@@ -318,7 +264,73 @@ namespace ft {
 		{
 			erase(this->begin(), this->end());
 		}
+		/** Push_back
+		 *******************/
+		void	push_back(const Type& X)
+		{
+			insert(this->end(), X);
+		}
+		/** Pop_back
+		 *******************/
+		void	pop_back()
+		{
+			erase(this->end() - 1);
+		}
 
+		void 	reserve(sizeType N)
+		{
+			if (this->max_size() < N)
+				exception_length();
+			if (this->capacity() < N)
+			{
+				ptr copy = _allocator.allocate(N, (void *)nullptr);
+				try {
+					Copy(this->begin(), this->end(), copy);
+				}
+				catch (...) {
+					_allocator.deallocate(copy, N);
+					throw ;
+				}
+				if (_first != 0)
+				{
+					Destroy(_first, _last);
+					_allocator.deallocate(_first, _end - _first);
+					_end = copy + N;
+					_last = copy + this->size();
+					_first = copy;
+				}
+			}
+		}
+
+		void	resize(sizeType N)
+		{
+			resize(N, Type());
+		}
+
+		void	resize(sizeType N, Type X)
+		{
+			if (this->size() < N)
+				insert(this->end(), N - this->size(), X);
+			else if (N < this->size())
+				erase(this->begin() + N, this->end());
+		}
+
+		template <class Iter>
+		void assign(Iter first, Iter last) { Assign(first, last, ft::Iter_cat(first)); }
+
+		template <class Iter>
+		void Assign(Iter first, Iter last, ft::Int_iterator_tag)
+		{
+			erase(this->begin(), this->end());
+			insert(this->begin(), first, last);
+		}
+
+		void assign(sizeType N, const Type& X)
+		{
+			Type Y = X;
+			erase(this->begin(), this->end());
+			insert(this->begin(), N, Y);
+		}
 
 	protected:
 		Alloc	_allocator;
