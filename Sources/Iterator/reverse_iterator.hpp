@@ -30,7 +30,7 @@ namespace ft {
 		reverse_iterator(){};
 		explicit	reverse_iterator(RandIter x) : _current(x) {};
 		reverse_iterator(const reverse_iterator<RandIter>& other) : _current(other.base()) {};
-		virtual ~reverse_iterator();
+		virtual ~reverse_iterator() {};
 
 		RandIter	base() const { return _current; };
 

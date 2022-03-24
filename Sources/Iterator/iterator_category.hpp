@@ -19,7 +19,7 @@ namespace ft {
 	}
 
 	template < class Type >
-	random_access_iterator_tag	Iter_cat(const Type*)
+	random_access_iterator_tag	Iter_cat(const Type)
 	{
 		return (random_access_iterator_tag());
 	}
