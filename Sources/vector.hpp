@@ -79,22 +79,19 @@ namespace ft {
 		}
 
 		template < class Iter >
-		vector(Iter first, Iter last) { Construct(first, last, ft::Iter_cat(first)); }
+		vector(Iter first, Iter last, typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr)
+		{
+			Buy(0);
+			insert(this->begin(), first, last);
+		}
 
 		template < class Iter >
-		void	Construct(Iter first, Iter last, Int_iterator_tag)
-				{
-					sizeType N = (sizeType)first;
-					if (Buy(N))
-						_last = Fill(_first, N, (Type)last);
-				}
-
-		template < class Iter >
-		void	Construct(Iter first, Iter last, input_iterator_tag)
-				{
-					Buy(0);
-					insert(this->begin(), first, last);
-				}
+		vector(Iter first, Iter last, typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr)
+		{
+			sizeType N = (sizeType)first;
+			if (Buy(N))
+				_last = Fill(_first, N, (Type)last);
+		}
 		~vector() { Clear(); }
 
 		//_3_Capacity___________________________________________________________________________________________________
@@ -193,26 +190,18 @@ namespace ft {
 		};
 
 		//__Assign__________________________________
-		template <class Iter>
-		void assign(Iter first, Iter last) { Assign(first, last, ft::Iter_cat(first)); }
-
-		template <class Iter>
-		void Assign(Iter first, Iter last, ft::Int_iterator_tag)
+		template <class Iter> // for integral Iter
+		void assign(Iter first, Iter last, typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr)
 		{
-			assign((sizeType)first, (Type)last);
+			erase(this->begin(), this->end());
+			insert(this->begin(), (sizeType)first, (Type)last);
 		}
 
-		template <class Iter>
-		void Assign(Iter first, Iter last, ft::input_iterator_tag)
+		template <class Iter> // for iterators
+		void assign(Iter first, Iter last, typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr)
 		{
 			erase(this->begin(), this->end());
 			insert(this->begin(), first, last);
-		}
-
-		void assign(sizeType N, const Type& X)
-		{
-			erase(this->begin(), this->end());
-			insert(this->begin(), N, X);
 		}
 
 		//_6_Modifiers__________________________________________________________________________________________________
@@ -238,13 +227,7 @@ namespace ft {
 			// if capacity < needed space
 			else if (this->size() + count >= this->capacity()) {
 				// calculate needed capacity to allocate
-//				N = (this->max_size() - N/2 < N) ? 0 : N + N/2;
-//				N = N + N/2; // todo: ???
-//				if (this->size() + count >= N)
-//					N = this->size() + count;
 				N = std::max(this->size() + count, N * 2);
-
-
 				newFirst = _allocator.allocate(N); // allocate bigger memory storage
 				try {
 					newLast = Copy(this->begin(), position, newFirst); // copy elements before position in new storage
@@ -289,25 +272,20 @@ namespace ft {
 			}
 		}
 
-		template < class Iter >
-		void	insert(iterator position, Iter First, Iter Last)
-		{
-			Insert(position, First, Last, ft::Iter_cat(First));
-		}
+//		template < class Iter >
+//		void	insert(iterator position, Iter First, Iter Last)
+//		{
+//			Insert(position, First, Last, ft::Iter_cat(First));
+//		}
 
-		template < class Iter >
-		void	Insert(iterator position, Iter First, Iter Last, Int_iterator_tag) {
+		template < class Iter > // for integral Iter
+		void	insert(iterator position, Iter First, Iter Last, typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr)
+		{
 			insert(position, (sizeType)First, (Type)Last);
 		}
 
-		template < class Iter >
-		void	Insert(iterator position, Iter First, Iter Last, input_iterator_tag) {
-			for (; First != Last; ++First, ++position)
-				position = insert(position, *First);
-		}
-
-		template < class Iter >
-		void	Insert(iterator position, Iter First, Iter Last, forward_iterator_tag) {
+		template < class Iter > // for iterators
+		void	insert(iterator position, Iter First, Iter Last, typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr) {
 			sizeType	count = 0;
 			sizeType	N = this->capacity();
 			ptr			newFirst;
@@ -319,10 +297,6 @@ namespace ft {
 			else if (this->max_size() - this->size() < count) // not enough possible allocated memory
 				exception_length();
 			else if (this->capacity() < this->size() + count) { // not enough already allocated memory
-//				N = this->max_size() - N/2 < N ? 0 : N + N/2;
-//				N = N * 2; // finding new needed capacity to allocate
-//				if (N < this->size() + count)
-//					N = this->size() + count;
 				N = std::max(this->size() + count, N * 2);
 				newFirst = _allocator.allocate(N);
 
@@ -347,10 +321,6 @@ namespace ft {
 			else if ((sizeType)(this->end() - position) < count) { //
 				Copy(position, this->end(), position.base() + count);
 				Iter Mid = First;
-//				sizeType m = this->end() - position;
-//				for (; m > 0; --m)
-//					Mid++;
-//				std::advance(Mid, this->end() - position);
 				Mid += this->end() - position;
 				try {
 					Copy(Mid, Last, _last);
@@ -373,12 +343,8 @@ namespace ft {
 		//__Erase___________________________
 		iterator	erase(iterator position)
 		{
-//			if (position == this->end() - 1)
-//				_allocator.destroy(position.base());
-//			else {
-				ft::copy(position + 1, this->end(), position);
-				Destroy(_last - 1, _last);
-//			}
+			ft::copy(position + 1, this->end(), position);
+			Destroy(_last - 1, _last);
 			--_last;
 			return position;
 		}

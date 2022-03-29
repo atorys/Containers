@@ -7,6 +7,7 @@
 #include "cstdio"
 #include "Sources/vector.hpp"
 #include "Sources/stack.hpp"
+#include "Sources/tree.hpp"
 
 int main()
 {
@@ -53,7 +54,20 @@ int main()
 //	std::cout << vector.size() << std::endl;
 //	std::cout << vector.capacity();
 
-	ft::vector<int> vector(3);
+	{
+		ft::RedBlackTree<int>	tree;
+
+//		tree.insert(10);
+//		tree.insert(11);
+		tree.insert(13);
+		tree.print();
+		tree.insert(11);
+		tree.print();
+		tree.insert(12);
+		tree.insert(44);
+		tree.insert(1);
+		tree.print();
+	}
 
 	return 0;
 }

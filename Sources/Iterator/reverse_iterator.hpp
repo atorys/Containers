@@ -50,7 +50,7 @@ namespace ft {
 
 		thisType	operator++(int)
 		{
-			thisType tmp(this);
+			thisType tmp = this;
 			--_current;
 			return tmp;
 		};
@@ -99,5 +99,12 @@ namespace ft {
 	bool	operator!=(const reverse_iterator<RandIter>& A, const reverse_iterator<RandIter>& B)
 	{
 		return !(A.Eq(B));
+	}
+
+	template < class RandIter > inline
+	reverse_iterator<RandIter>	operator+(typename iterator_traits<RandIter>::diffType N,
+												  const reverse_iterator<RandIter>& x)
+	{
+		return (x - N);
 	}
 }
