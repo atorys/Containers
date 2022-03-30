@@ -8,6 +8,7 @@
 #include "Sources/vector.hpp"
 #include "Sources/stack.hpp"
 #include "Sources/tree.hpp"
+#include "Sources/map.hpp"
 
 int main()
 {
@@ -57,16 +58,36 @@ int main()
 	{
 		ft::RedBlackTree<int>	tree;
 
-//		tree.insert(10);
-//		tree.insert(11);
-		tree.insert(13);
-		tree.print();
+		tree.insert(10);
 		tree.insert(11);
-		tree.print();
-		tree.insert(12);
-		tree.insert(44);
-		tree.insert(1);
-		tree.print();
+//		tree.print();
+//		tree.print();
+		tree.insert(10);
+		tree.insert(6);
+		tree.insert(45);
+		tree.insert(4);
+		tree.insert(8);
+		tree.insert(0);
+		tree.insert(25);
+		tree.insert(15);
+		tree.insert(22);
+		tree.insert(6);
+//		tree.print();
+
+//		std::cout << tree.size() << "\n";
+//		tree.insert(33);
+//		std::cout << tree.size() << "\n";
+
+		ft::RedBlackTree<int>::iterator	it;
+		it = tree.begin();
+		for (; it != tree.end(); ++it)
+			std::cout << *(it) << "\n";
+
+
+		ft::map<int, int> map;
+
+		map.begin();
+//		std::cout << map.size() << "\n";
 	}
 
 	return 0;

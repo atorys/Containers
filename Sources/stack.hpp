@@ -23,32 +23,32 @@ namespace ft {
 	public:
 
 		//_1_Member_types_______________________________________________________________________________________________
-		typedef typename Container::valueType	valueType;
 
-		typedef typename Container::sizeType	sizeType;
+		typedef typename Container::valueType		valueType;
+		typedef typename Container::sizeType		sizeType;
 
 		//_2_Constructors_______________________________________________________________________________________________
-		stack(): _c() {};
-		explicit	stack(const Container& Cont): _c(Cont) {}
-		stack(const stack<Type, Container>& other): _c(other._c) {}
 
+		stack(): _c() {};
+		explicit	stack(const Container& Cont):	_c(Cont)		{}
+		stack(const stack<Type, Container>& other):	_c(other._c)	{}
 		~stack() { _c.clear(); }
 
 		//_3_Capacity___________________________________________________________________________________________________
-		bool				empty() const	{ return _c.empty(); }
 
+		bool				empty() const	{ return _c.empty(); }
 		sizeType			size() const	{ return _c.size(); }
 
 		//_4_Element_access_____________________________________________________________________________________________
-		valueType&			top()			{ return _c.back(); }
 
+		valueType&			top()			{ return _c.back(); }
 		const valueType&	top() const		{ return _c.back(); }
 
 		//_5_Modifiers__________________________________________________________________________________________________
-		void				push(const valueType& X)	{ _c.push_back(X); }
-		void				pop()						{ _c.pop_back(); }
-		bool 				eq(const stack<Type, Container>& other) const	{ return (_c == other._c); }
 
+		void				push(const valueType& X)						{ _c.push_back(X); }
+		void				pop()											{ _c.pop_back(); }
+		bool 				eq(const stack<Type, Container>& other) const	{ return (_c == other._c); }
 		bool 				less(const stack<Type, Container>& other) const	{ return (_c < other._c); }
 	};
 

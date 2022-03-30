@@ -8,21 +8,21 @@ namespace ft {
 
 	template < class A, class B >
 	struct	pair {
-		A		_first;
-		B		_second;
+		A		first;
+		B		second;
 
-		pair(): _first(A()), _second(B()) {}
+		pair(): first(A()), second(B()) {}
 
 		template < class T1, class T2 >
-		pair(const pair<T1, T2>& other): _first(other._first), _second(other._second) {}
-		pair(const A& X, const B& Y): _first(X), _second(Y) {}
+		pair(const pair<T1, T2>& other): first(other._first), second(other._second) {}
+		pair(const A& X, const B& Y): first(X), second(Y) {}
 
 		pair&	operator=(const pair& other)
 		{
 			if (this == &other)
 				return *this;
-			_first = other._first;
-			_second = other._second;
+			first = other._first;
+			second = other._second;
 			return *this;
 		}
 
