@@ -13,7 +13,7 @@ namespace ft {
 	 *****************************************************/
 
 	template < class Cat, class Type, class Diff, class Ptr, class Ref > inline
-	Cat	Iter_cat(const ft::iterator <Cat, Type, Diff, Ptr, Ref>&)
+	Cat	Iter_cat(const ft::iterator<Cat, Type, Diff, Ptr, Ref>&)
 	{
 		return (Cat()); // new object
 	}

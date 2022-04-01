@@ -12,9 +12,9 @@ namespace ft {
 	 **********************************/
 
 	template < class RandIter >
-	class	reverse_iterator : public ft::iterator <typename iterator_traits<RandIter>::iterCategory,
-													typename iterator_traits<RandIter>::valueType,
-													typename iterator_traits<RandIter>::diffType,
+	class	reverse_iterator : public ft::iterator <typename iterator_traits<RandIter>::iterator_category,
+													typename iterator_traits<RandIter>::value_type,
+													typename iterator_traits<RandIter>::difference_type,
 													typename iterator_traits<RandIter>::pointer,
 													typename iterator_traits<RandIter>::reference >
 	{
@@ -22,10 +22,10 @@ namespace ft {
 		RandIter	_current;
 
 	public:
-		typedef	typename ft::iterator_traits<RandIter>::diffType	thisDiff;
-		typedef	typename ft::iterator_traits<RandIter>::pointer 	thisPtr;
-		typedef	typename ft::iterator_traits<RandIter>::reference	thisRef;
-		typedef reverse_iterator<RandIter>							thisType;
+		typedef	typename ft::iterator_traits<RandIter>::difference_type	thisDiff;
+		typedef	typename ft::iterator_traits<RandIter>::pointer 		thisPtr;
+		typedef	typename ft::iterator_traits<RandIter>::reference		thisRef;
+		typedef reverse_iterator<RandIter>								thisType;
 
 		reverse_iterator(){};
 		explicit	reverse_iterator(RandIter x) : _current(x) {};

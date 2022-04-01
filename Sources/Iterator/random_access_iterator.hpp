@@ -12,23 +12,23 @@ namespace ft {
 	 ****************************************/
 
 	template < class RandIter >
-	class	random_access_iterator : public ft::iterator  < typename ft::iterator_traits<RandIter>::iterCategory,
-															typename ft::iterator_traits<RandIter>::valueType,
-															typename ft::iterator_traits<RandIter>::diffType,
+	class	random_access_iterator : public ft::iterator  < typename ft::iterator_traits<RandIter>::iterator_category,
+															typename ft::iterator_traits<RandIter>::value_type,
+															typename ft::iterator_traits<RandIter>::difference_type,
 															typename ft::iterator_traits<RandIter>::pointer,
 															typename ft::iterator_traits<RandIter>::reference >
 	{
-		typedef	typename ft::iterator_traits<RandIter>::diffType	thisDiff;
-		typedef	typename ft::iterator_traits<RandIter>::pointer 	thisPtr;
-		typedef	typename ft::iterator_traits<RandIter>::reference 	thisRef;
-		typedef random_access_iterator<RandIter>					thisType;
+
+		typedef	typename ft::iterator_traits<RandIter>::difference_type	thisDiff;
+		typedef	typename ft::iterator_traits<RandIter>::pointer 		thisPtr;
+		typedef	typename ft::iterator_traits<RandIter>::reference 		thisRef;
+		typedef random_access_iterator<RandIter>						thisType;
 
 	protected:
 
 		thisPtr		_current;
 
 	public:
-
 		random_access_iterator(){};
 		explicit random_access_iterator(thisPtr x) : _current(x) {}
 		random_access_iterator(const thisType& other) : _current(other.base()) {}

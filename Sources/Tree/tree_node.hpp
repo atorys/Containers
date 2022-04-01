@@ -18,12 +18,6 @@ namespace ft {
 		treeNode*	_right;
 		bool		_color;
 
-
-		explicit	treeNode(Type* data, treeNode* parent = nullptr):	_data(data),
-																	  	_parent(parent),
-																	  	_left(nullptr),
-																	  	_right(nullptr),
-																	  	_color(Red) {}
 //		treeNode&	operator=(const treeNode& other)
 //		{
 //			if (this == &other)
@@ -36,6 +30,9 @@ namespace ft {
 //			_height = other._height;
 //			return *this;
 //		}
+		bool	operator>(const treeNode& other) const {
+
+		}
 
 		Type&	operator*() { return *_data; }
 	};

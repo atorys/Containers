@@ -13,9 +13,10 @@ namespace ft {
 	struct	is_integral_base
 	{
 		static const bool	value = Value;
-		typedef	Type		type;
+		typedef	Type		value_type;
 
 		bool	operator()() const { return value; };
+		operator value_type() const { return value; }
 	};
 
 	template < class Type >
@@ -56,4 +57,10 @@ namespace ft {
 
 	template <>
 	struct	is_integral<long long>:			public ft::is_integral_base<long long, true> {};
+
+	template <>
+	struct	is_integral<float>:				public ft::is_integral_base<float, true> {};
+
+	template <>
+	struct	is_integral<double>:			public ft::is_integral_base<double, true> {};
 }

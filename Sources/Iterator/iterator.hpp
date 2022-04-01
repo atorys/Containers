@@ -24,12 +24,12 @@ namespace ft {
     /**
      * template class ITERATOR
      */
-    template <  class Category, class Type, class Difference = ptrdiff_t, class Pointer = Type*, class Reference = Type& >
+    template < class Category, class Type, class Difference = ptrdiff_t, class Pointer = Type*, class Reference = Type& >
         struct  iterator {
         public:
-            typedef Category    	iterCategory;
-            typedef Type			valueType;
-            typedef Difference		diffType;
+            typedef Category    	iterator_category;
+            typedef Type			value_type;
+            typedef Difference		difference_type;
             typedef Pointer			pointer;
             typedef Reference		reference;
         };
@@ -51,27 +51,27 @@ namespace ft {
      */
         template < class Iter >
         struct  iterator_traits {
-            typedef typename Iter::iterCategory     iterCategory;
-            typedef typename Iter::valueType        valueType;
-            typedef typename Iter::diffType         diffType;
-            typedef typename Iter::pointer          pointer;
-            typedef typename Iter::reference        reference;
+            typedef typename Iter::iterator_category	iterator_category;
+            typedef typename Iter::value_type			value_type;
+            typedef typename Iter::difference_type		difference_type;
+            typedef typename Iter::pointer          	pointer;
+            typedef typename Iter::reference        	reference;
         };
 
         template < class Type >
         struct  iterator_traits < Type* > {
-            typedef random_access_iterator_tag      iterCategory;
-            typedef Type                            valueType;
-            typedef ptrdiff_t                       diffType;
+            typedef random_access_iterator_tag      iterator_category;
+            typedef Type                            value_type;
+			typedef ptrdiff_t                       difference_type;
             typedef Type*                           pointer;
             typedef Type&                           reference;
         };
 
         template < class Type >
         struct  iterator_traits < const Type* > {
-            typedef random_access_iterator_tag      iterCategory;
-            typedef Type                            valueType;
-            typedef ptrdiff_t                       diffType;
+            typedef random_access_iterator_tag      iterator_category;
+            typedef Type                            value_type;
+            typedef ptrdiff_t                       difference_type;
             typedef const Type*                     pointer;
             typedef const Type&                     reference;
         };

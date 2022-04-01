@@ -6,48 +6,62 @@
 
 #include <memory>
 #include "tree_node.hpp"
-#include "Utils/pair.hpp"
-#include "Iterator/tree_iterator.hpp"
+#include "../Utils/pair.hpp"
+#include "../Iterator/tree_iterator.hpp"
+#include "tree_traits.hpp"
 
 #define RED	"\033[31m"
 #define DEF	"\033[0m"
 
 namespace ft {
 
-	template < class Type, class Alloc = std::allocator<Type> >
+	template < class RedBlackTreeTraits >
 	class RedBlackTree {
 	public:
+
 		//_1_Member_types_______________________________________________________________________________________________
-		// Type = ft::pair <Key, Value>
-		typedef	RedBlackTree <Type, Alloc>				thisType;
-//		typedef typename Type::first					key;
-//		typedef typename Comp::keyCompare				keyCompare;
-		typedef typename Alloc::size_type				sizeType;
-		typedef typename Alloc::difference_type			diffType;
+		typedef	RedBlackTree < RedBlackTreeTraits >					self;
 
-		typedef typename Alloc::pointer					ptr;
-		typedef typename Alloc::reference				ref;
-		typedef typename Alloc::const_pointer			const_ptr;
-		typedef typename Alloc::const_reference			const_ref;
-		typedef treeNode<Type>*							nodePtr;
-		typedef treeNode<Type>&							nodeRef;
-		typedef const treeNode<Type>*					const_nodePtr;
-		typedef const treeNode<Type>&					const_nodeRef;
-		typedef treeNode<Type>							Node;
+		typedef typename RedBlackTreeTraits::Data					Data;
+		typedef typename RedBlackTreeTraits::Node					NodeType;
+		typedef typename RedBlackTreeTraits::key_type				KeyType;
+		typedef typename RedBlackTreeTraits::value_type				ValueType;
+		typedef typename RedBlackTreeTraits::key_compare			key_compare;
+		typedef typename RedBlackTreeTraits::sizeType				sizeType;
+		typedef typename RedBlackTreeTraits::diffType				diffType;
 
-		typedef ft::tree_iterator < Type, BiDirIter <Node, diffType, nodePtr, nodeRef> >				iterator;
-		typedef ft::tree_iterator < Type, BiDirIter <Node, diffType, const_nodePtr, const_nodeRef> >	const_iterator;
+		typedef typename RedBlackTreeTraits::pointer				nodePtr;
+		typedef typename RedBlackTreeTraits::const_pointer			const_nodePtr;
+		typedef typename RedBlackTreeTraits::reference				nodeRef;
+		typedef typename RedBlackTreeTraits::const_reference		const_nodeRef;
+
+
+		typedef typename RedBlackTreeTraits::self_type_allocator	allocPair;
+		typedef typename RedBlackTreeTraits::allocator_for_node		allocNode;
+
+
+		typedef ft::tree_iterator < Data, BiDirIter <NodeType, diffType, nodePtr, nodeRef> >				iterator;
+		typedef ft::tree_iterator < Data, BiDirIter <NodeType, diffType, const_nodePtr, const_nodeRef> >	const_iterator;
 
 
 		//_2_Constructors_______________________________________________________________________________________________
-		explicit	RedBlackTree(const Alloc& A = Alloc()): _allocator(A), _root(nullptr), _end(nullptr) {}
+		explicit	RedBlackTree(const key_compare& comp = key_compare(), const allocPair& A = allocPair()):	_allocator(A),
+																										_allocator_node(allocNode()),
+																										_key_compare(comp),
+																										_root(nullptr), _end(nullptr) {}
+		explicit	RedBlackTree(self const& other):	_allocator(allocPair()),
+														_allocator_node(allocNode()),
+														_key_compare(key_compare()),
+														_root(nullptr), _end(nullptr) {
+			//(...)
+		}
 		~RedBlackTree() { Clear(_root); }
 
 		//_3_Capacity___________________________________________________________________________________________________
 		sizeType				size()	const			{ return Size(_root); }
-		sizeType				max_size()	const		{ return _allocator.max_size(); }
+		sizeType				max_size()	const		{ return _allocator_node.max_size(); }
 		bool 					empty() const			{ return (size() == 0); }
-		Alloc					get_allocator() const	{ return _allocator; }
+		allocPair				get_allocator() const	{ return _allocator; } // todo : maybe allocNode?
 
 		//_4_Element_access_____________________________________________________________________________________________
 
@@ -72,13 +86,17 @@ namespace ft {
 		//_6_Modifiers__________________________________________________________________________________________________
 
 		void		clear()	{ Clear(this->_root); }
-		void		insert(const Type& X)
+		void		insert(const ValueType& X)
 		{
+//			if (find)
+//				return ;
 			nodePtr	newNode = Construct(X);
 			_root = Insert(newNode, _root);
 			fixViolation(newNode);
 		}
-//		iterator	find() {  }
+
+		iterator	find(KeyType const& key) const	{ return iterator(Find(key, this->_root)); }
+		sizeType	count(KeyType const& key) const	{ return (sizeType)(Find(key, this->_root) != nullptr); }
 
 		void	print()
 		{
@@ -206,9 +224,11 @@ namespace ft {
 
 
 	private:
-		Alloc		_allocator;
-		nodePtr		_root;
-		nodePtr		_end;
+		allocPair		_allocator;
+		allocNode		_allocator_node;
+		key_compare		_key_compare;
+		nodePtr			_root;
+		nodePtr			_end;
 
 		void	Init(nodePtr node, nodePtr parent) {
 			node->_data = nullptr;
@@ -220,10 +240,15 @@ namespace ft {
 
 		// Allocates memory and constructs new Node
 		// with data = *X
-		nodePtr	Construct(const Type& X, nodePtr parent = nullptr) {
-			Type*	data = _allocator.allocate(1);
-			_allocator.construct(data, X);
-			return (new Node(data, parent));
+		nodePtr	Construct(const ValueType& X, nodePtr parent = nullptr) {
+			nodePtr newNode = _allocator_node.allocate(1);
+			newNode->_data = _allocator.allocate(1);
+			_allocator.construct(newNode->_data, ValueType(X));
+			newNode->_parent = parent;
+			newNode->_left = nullptr;
+			newNode->_right = nullptr;
+			newNode->_color = Red;
+			return (newNode);
 		}
 
 		void	Clear(nodePtr position)
@@ -239,7 +264,9 @@ namespace ft {
 		{
 			_allocator.destroy(position->_data);
 			_allocator.deallocate(position->_data, 1);
-			delete	position;
+			position->_data = nullptr;
+			_allocator_node.destroy(position);
+			_allocator_node.deallocate(position, 1);
 			position = nullptr;
 		}
 
@@ -247,15 +274,21 @@ namespace ft {
 		{
 			if (!position)
 				return newNode;
-			else if (*(newNode->_data) < *(position->_data)) {
+			else if (RedBlackTreeTraits::key_compare(getKey(newNode), getKey(position))) {
 				position->_left = Insert(newNode, position->_left);
 				position->_left->_parent = position;
 			}
-			else if (*(newNode->_data) > *(position->_data)) {
+			else if (RedBlackTreeTraits::key_compare(getKey(position)), getKey(newNode)) {
 				position->_right = Insert(newNode, position->_right);
 				position->_right->_parent = position;
 			}
 			return position;
+		}
+
+		nodePtr		Find(KeyType const& key, const nodePtr& position) const {
+			if (!position)
+				return position;
+			RedBlackTreeTraits::key_compare(key, getKey(position)) ? Find(key, position->_left) : Find(key, position->_right);
 		}
 
 		sizeType	Size(const nodePtr& position) const {
@@ -270,25 +303,27 @@ namespace ft {
 			return position && position->_right ? Max(position->_right) : position;
 		}
 
+		KeyType&	getKey(const nodePtr & position) { return RedBlackTreeTraits::GetKey(position); }
+
 		void	PrintNode(nodePtr& node)
 		{
 			if (!node)
 				return;
 //			if (node->_parent) {
 //				node->_parent->_color == Red ? std::cout << RED : std::cout << DEF;
-//				std::cout << "parent: " << *(node->_parent->_data) << ", ";
+//				std::cout << "parent: " << *(node->_parent->_data->_first) << ", ";
 //			}
 			if (node->_data) {
 				node->_color == Red ? std::cout << RED : std::cout << DEF;
-				std::cout << "current: " << *(node->_data) << ", ";
+				std::cout << "current: " << getKey(node) << ", ";
 			}
 			if (node->_left) {
 				node->_left->_color == Red ? std::cout << RED : std::cout << DEF;
-				std::cout << "left: " << *(node->_left->_data) << ", ";
+				std::cout << "left: " << getKey(node->_left) << ", ";
 			}
 			if (node->_right) {
 				node->_right->_color == Red ? std::cout << RED : std::cout << DEF;
-				std::cout << "right: " << *(node->_right->_data);
+				std::cout << "right: " << getKey(node->_right);
 			}
 			std::cout << "\n";
 		}

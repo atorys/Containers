@@ -12,16 +12,16 @@ namespace ft {
  	**********************************/
 
 	template < class Type, class BiDirIter >
-	class	tree_iterator : public ft::iterator <	typename iterator_traits<BiDirIter>::iterCategory,
-													typename iterator_traits<BiDirIter>::valueType,
-													typename iterator_traits<BiDirIter>::diffType,
+	class	tree_iterator : public ft::iterator <	typename iterator_traits<BiDirIter>::iterator_category,
+													typename iterator_traits<BiDirIter>::value_type,
+													typename iterator_traits<BiDirIter>::difference_type,
 													typename iterator_traits<BiDirIter>::pointer,
 													typename iterator_traits<BiDirIter>::reference >
 	{
-		typedef	typename ft::iterator_traits<BiDirIter>::diffType	thisDiff;
-		typedef	typename ft::iterator_traits<BiDirIter>::pointer 	thisPtr;
-		typedef	typename ft::iterator_traits<BiDirIter>::reference	thisRef;
-		typedef tree_iterator<Type, BiDirIter>						thisType;
+		typedef	typename ft::iterator_traits<BiDirIter>::difference_type	thisDiff;
+		typedef	typename ft::iterator_traits<BiDirIter>::pointer 			thisPtr;
+		typedef	typename ft::iterator_traits<BiDirIter>::reference			thisRef;
+		typedef tree_iterator<Type, BiDirIter>								thisType;
 	protected:
 
 		thisPtr		_current;

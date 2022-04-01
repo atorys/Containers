@@ -1,5 +1,5 @@
 //
-// Created by atory on 3/24/22.
+// Created by Achiote Tory on 3/31/22.
 //
 
 #pragma once
@@ -11,23 +11,22 @@
 namespace ft {
 
 	template < class Key, class Type, class Compare = std::less<Key>,
-	        class Alloc = std::allocator<ft::pair<const Key, Type> > >
-	class	map {
-
-		typedef	ft::RedBlackTree< RedBlackTreeTraits < ft::pair<const Key, Type>, Compare, Alloc> >	Container;
-
+			class Alloc = std::allocator<Key>,
+			class Container = ft::RedBlackTree< Key, Alloc > >
+	class set {
 	private:
 		Container	_c;
-
 	public:
 
 		//_1_Member_types_______________________________________________________________________________________________
 
-		typedef ft::pair<const Key, Type>				valueType;
+		typedef Key										keyType;
+		typedef Key										valueType;
 		typedef typename Alloc::template
 		rebind<valueType>::other						allocType;
-		typedef map <Key, Type, Compare, Alloc>			thisType;
-		typedef Key										keyType;
+		typedef typename Alloc::template
+		rebind<valueType>::other::pointer				allocPtr;
+		typedef set <Key, Compare, Alloc>				thisType;
 		typedef Type									type;
 		typedef Alloc									allocator;
 		typedef typename Alloc::size_type				sizeType;
@@ -43,19 +42,19 @@ namespace ft {
 
 		//_2_Constructors_______________________________________________________________________________________________
 
-		explicit	map(const Compare& comp = Compare(), const Alloc& allocator = Alloc()): _c(comp, allocator) {}
-		explicit	map(const Container& Cont):	_c(Cont) {}
+		explicit	set(const Compare& comp = Compare(), const Alloc& allocator = Alloc()): _c(comp, allocator) {}
+		explicit	set(const Container& Cont):	_c(Cont) {}
 		template < class Iter >
-		map(Iter first, Iter last, const Compare& comp = Compare(), const Alloc& allocator = Alloc(),
-			typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr): _c(comp, allocator)
-		{
-			if (first == last)
-				return ;
-			for (; first != last; ++first)
-				_c.insert(*first);
-		}
-		explicit map(const thisType& other): _c(other._c) {}
-		~map() { _c.clear(); }
+		set(Iter first, Iter last, const Compare& comp = Compare(), const Alloc& A = Alloc(),
+		typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr): _c(A)
+				{
+						if (first == last)
+						return ;
+						for (; first != last; ++first)
+						_c.insert(*first);
+				}
+		explicit set(const thisType& other): _c(other._c) {}
+		~set() { _c.clear(); }
 
 
 		//_3_Capacity___________________________________________________________________________________________________

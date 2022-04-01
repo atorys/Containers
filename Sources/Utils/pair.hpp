@@ -36,6 +36,26 @@ namespace ft {
 		}
 	};
 
+	template < bool Value >
+	struct	is_pair_base {
+		static const bool	value = Value;
+		bool	operator()() const { return value; };
+	};
+
+	template < class Type >
+	struct is_pair: public ft::is_pair_base<false> {};
+
+	template <>
+	struct is_pair<int>: public ft::is_pair_base<false> {};
+
+	template <>
+	struct is_pair<char *>: public ft::is_pair_base<false> {};
+
+	template < class T1, class T2 >
+	struct is_pair< ft::pair<T1, T2> >: public ft::is_pair_base<true> {};
+
+
+
 	template < class T1, class T2 >
 	pair<T1, T2>	make_pair(const T1& X, const T2& Y)
 	{

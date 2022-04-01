@@ -14,9 +14,9 @@ namespace ft {
 	 *************************************************/
 
 	template < class InIter > inline
-	typename ft::iterator_traits <InIter>::diffType	distance(InIter first, InIter last)
+	typename ft::iterator_traits<InIter>::difference_type	distance(InIter first, InIter last)
 	{
-		typename ft::iterator_traits<InIter>::diffType N = 0;
+		typename ft::iterator_traits<InIter>::difference_type N = 0;
 		distanceIterTag(first, last, N, ft::Iter_cat(first));
 		return (N);
 	}
