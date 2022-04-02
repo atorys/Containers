@@ -22,7 +22,7 @@ namespace ft {
 		typedef	typename ft::iterator_traits<RandIter>::difference_type	thisDiff;
 		typedef	typename ft::iterator_traits<RandIter>::pointer 		thisPtr;
 		typedef	typename ft::iterator_traits<RandIter>::reference 		thisRef;
-		typedef random_access_iterator<RandIter>						thisType;
+		typedef random_access_iterator<RandIter>						Self;
 
 	protected:
 
@@ -31,12 +31,12 @@ namespace ft {
 	public:
 		random_access_iterator(){};
 		explicit random_access_iterator(thisPtr x) : _current(x) {}
-		random_access_iterator(const thisType& other) : _current(other.base()) {}
+		random_access_iterator(const Self& other) : _current(other.base()) {}
 		virtual ~random_access_iterator(){}
 
 		thisPtr		base() const { return _current; }
 
-		thisType& 	operator=(const thisType& other)
+		Self& 	operator=(const Self& other)
 					{
 						if (this != &other)
 							_current = other.base();
@@ -44,49 +44,49 @@ namespace ft {
 					};
 		thisRef 	operator*() const { return *_current; }
 		thisPtr		operator->() const { return &**this; }
-		thisType&	operator++()
+		Self&	operator++()
 					{
 						++_current;
 						return	*this;
 					}
-		thisType	operator++(int)
+		Self	operator++(int)
 					{
-						thisType tmp(*this);
+						Self tmp(*this);
 						++_current;
 						return tmp;
 					}
-		thisType&	operator--()
+		Self&	operator--()
 					{
 						--_current;
 						return *this;
 					}
-		thisType	operator--(int)
+		Self	operator--(int)
 					{
-						thisType tmp(*this);
+						Self tmp(*this);
 						--_current;
 						return tmp;
 					}
-		thisType 	operator+(thisDiff N) const { return thisType (_current + N); }
-		thisType 	operator-(thisDiff N) const { return thisType (_current - N); }
-		thisType&	operator+=(thisDiff N)
+		Self 	operator+(thisDiff N) const { return Self (_current + N); }
+		Self 	operator-(thisDiff N) const { return Self (_current - N); }
+		Self&	operator+=(thisDiff N)
 					{
 						_current += N;
 						return *this;
 					}
-		thisType&	operator-=(thisDiff N)
+		Self&	operator-=(thisDiff N)
 					{
 						_current -= N;
 						return *this;
 					}
-		bool 		operator==(const thisType& other) const { return (_current == other.base()); }
+		bool 		operator==(const Self& other) const { return (_current == other.base()); }
 		bool 		operator==(int other) const { return (_current == (thisPtr)other); }
-		bool 		operator!=(const thisType& other) const { return !(*this == other); }
-		bool 		operator>(const thisType& other) const { return (other < *this); }
-		bool 		operator<(const thisType& other) const { return (_current < other.base()); } // todo : 119 почему сравниваются ссылки
-		bool 		operator>=(const thisType& other) const { return !(*this < other); }
-		bool 		operator<=(const thisType& other) const { return !(other < *this); }
+		bool 		operator!=(const Self& other) const { return !(*this == other); }
+		bool 		operator>(const Self& other) const { return (other < *this); }
+		bool 		operator<(const Self& other) const { return (_current < other.base()); } // todo : 119 почему сравниваются ссылки
+		bool 		operator>=(const Self& other) const { return !(*this < other); }
+		bool 		operator<=(const Self& other) const { return !(other < *this); }
 		thisRef 	operator[](thisDiff N) { return *(*this + N); };
-		thisDiff 	operator-(const thisType& other) { return (_current - other.base());}
+		thisDiff 	operator-(const Self& other) { return (_current - other.base());}
 	};
 
 	template < class RandIter > inline

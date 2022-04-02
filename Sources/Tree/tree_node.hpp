@@ -4,15 +4,18 @@
 
 #pragma once
 
-#include <memory>
-
 namespace ft {
 
 	enum	Color	{Red, Black};
 
+	/**
+	 * Template structure Tree Node
+	 */
 	template < class Type >
 	struct treeNode {
+
 		Type*		_data;
+
 		treeNode*	_parent;
 		treeNode*	_left;
 		treeNode*	_right;
@@ -30,11 +33,13 @@ namespace ft {
 //			_height = other._height;
 //			return *this;
 //		}
-		bool	operator>(const treeNode& other) const {
-
-		}
 
 		Type&	operator*() { return *_data; }
+		treeNode(): _data(nullptr),
+					_parent(nullptr),
+					_left(nullptr),
+					_right(nullptr),
+					_color(Red) {}
 	};
 
 }

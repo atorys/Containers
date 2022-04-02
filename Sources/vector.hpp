@@ -37,7 +37,7 @@ namespace ft {
 
 		//_1_Member_types_______________________________________________________________________________________________
 
-		typedef vector <Type, Alloc>					thisType;
+		typedef vector <Type, Alloc>					Self;
 		typedef typename Alloc::size_type				sizeType;
 		typedef typename Alloc::difference_type			diffType;
 		typedef typename Alloc::value_type				valueType;
@@ -72,7 +72,7 @@ namespace ft {
 				_last = Fill(_first, N, X);
 		}
 		// copy constructor
-		vector(const thisType& other)
+		vector(const Self& other)
 		{
 			if (Buy(other.size()))
 				_last = Copy(other.begin(), other.end(), _first);
@@ -164,7 +164,7 @@ namespace ft {
 
 		//_5_Member_functions___________________________________________________________________________________________
 		//__Assignment_operator_____________________
-		thisType&	operator=(const thisType& other)
+		Self&	operator=(const Self& other)
 		{
 			if (this == &other)
 				;
@@ -391,7 +391,7 @@ namespace ft {
 		}
 
 		//__Swap____________________
-		void	swap(thisType& other)
+		void	swap(Self& other)
 		{
 			 if (this->_allocator == other._allocator) {
 				 std::swap(_first, other._first);
@@ -399,7 +399,7 @@ namespace ft {
 				 std::swap(_end, other._end);
 			 }
 			 else {
-				 thisType	tmp = *this;
+				 Self	tmp = *this;
 				 *this = other;
 				 other = tmp;
 			 }

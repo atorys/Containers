@@ -57,13 +57,14 @@ int main()
 //	std::cout << vector.capacity();
 
 	{
-		ft::RedBlackTree< ft::RedBlackTreeTraits<int, std::less<int>, std::allocator<int> > >	tree;
+
+		ft::RedBlackTree< ft::RedBlackTreeTraits<int, std::greater<int> > >	tree;
 
 		tree.insert(10);
 		tree.insert(11);
-//		tree.print();
 		tree.print();
-////		tree.insert(10);
+		tree.print();
+//		tree.insert(10);
 //		tree.insert(6);
 //		tree.insert(45);
 //		tree.insert(4);
@@ -73,28 +74,57 @@ int main()
 //		tree.insert(15);
 //		tree.insert(22);
 //		tree.insert(6);
-//		tree.print();
+		tree.print();
+//
+//		std::cout << tree.at(10);
 
 //		std::cout << tree.size() << "\n";
 //		tree.insert(33);
 //		std::cout << tree.size() << "\n";
 
-//		ft::RedBlackTree<int>::iterator	it;
+//		std::cout << *tree.find(45) << "\n";
+//		std::cout << tree.count(45) << "\n";
+//		std::cout << tree.count(99) << "\n";
+
+//		ft::RedBlackTree< ft::RedBlackTreeTraits<int, std::greater<int> > >::iterator	it;
 //		it = tree.begin();
 //		for (; it != tree.end(); ++it)
 //			std::cout << *(it) << "\n";
-
-
-		ft::map<int, int> map;
-		std::map<int, int> map2;
-
-//		map.ins
 //
-////		map.begin();
-		std::cout << map.max_size() << "\n";
-		std::cout << map2.max_size() << "\n";
+//		--it;
+//		for (; it != tree.end(); --it)
+//			std::cout << *(it) << "\n";
 
+		ft::map<int, std::string> map;
+		ft::map<int, std::string, std::greater<int> > map2;
+		ft::map<int, std::string, std::greater<int> >::iterator it2;
+//		std::map<int, int> map2;
+
+		it2	= map.begin();
+
+//		map.insert(ft::make_pair(1, "34"));
+//		map.insert(ft::make_pair(3, "97"));
+//		map.insert(ft::make_pair(0, "2"));
+//
+//		map.begin();
+//		std::cout << map.max_size() << "\n";
+//		ft::map<int, std::string>::iterator	it;
+//		it = map.begin();
+//		for (; it != map.end(); ++it)
+//			std::cout << (*it).first << "\n";
+//
+//		--it;
+//		for (; it != map.end(); --it)
+//			std::cout << (*it).first << "\n";
+//
+//		ft::map<int, std::string> map2;
+//		map2 = map;
+//
+//		it = map2.begin();
+//		for (; it != map2.end(); ++it)
+//			std::cout << (*it).first << "\n";
 	}
+
 //	while (1)
 //	{}
 	return 0;

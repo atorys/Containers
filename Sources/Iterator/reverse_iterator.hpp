@@ -25,7 +25,7 @@ namespace ft {
 		typedef	typename ft::iterator_traits<RandIter>::difference_type	thisDiff;
 		typedef	typename ft::iterator_traits<RandIter>::pointer 		thisPtr;
 		typedef	typename ft::iterator_traits<RandIter>::reference		thisRef;
-		typedef reverse_iterator<RandIter>								thisType;
+		typedef reverse_iterator<RandIter>								Self;
 
 		reverse_iterator(){};
 		explicit	reverse_iterator(RandIter x) : _current(x) {};
@@ -42,49 +42,49 @@ namespace ft {
 
 		thisPtr		operator->() const { return &**this; };
 
-		thisType&	operator++() // инкремент декрементирует тк у нас реверсивный указатель
+		Self&	operator++() // инкремент декрементирует тк у нас реверсивный указатель
 		{
 			--_current;
 			return *this;
 		};
 
-		thisType	operator++(int)
+		Self	operator++(int)
 		{
-			thisType tmp = this;
+			Self tmp = this;
 			--_current;
 			return tmp;
 		};
 
-		thisType&	operator--() // декремент инкрементирует тк у нас реверсивный указатель
+		Self&	operator--() // декремент инкрементирует тк у нас реверсивный указатель
 		{
 			++_current;
 			return *this;
 		};
 
-		thisType	operator--(int)
+		Self	operator--(int)
 		{
-			thisType tmp = *this;
+			Self tmp = *this;
 			++_current;
 			return tmp;
 		};
 
-		bool	Eq(const thisType& other) const { return (_current == other.base()); };
+		bool	Eq(const Self& other) const { return (_current == other.base()); };
 
-		thisType&	operator+=(thisDiff N)
+		Self&	operator+=(thisDiff N)
 		{
 			_current -= N;
 			return *this;
 		};
 
-		thisType	operator+(thisDiff N) const { return (thisType(_current - N)); };
+		Self	operator+(thisDiff N) const { return (Self(_current - N)); };
 
-		thisType&	operator-=(thisDiff N)
+		Self&	operator-=(thisDiff N)
 		{
 			_current += N;
 			return *this;
 		};
 
-		thisType	operator-(thisDiff N) const { return (thisType(_current + N)); };
+		Self	operator-(thisDiff N) const { return (Self(_current + N)); };
 
 		thisRef 	operator[](thisDiff N) const { return *(*this + N);	};
 	};

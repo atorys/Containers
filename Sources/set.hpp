@@ -7,15 +7,20 @@
 
 #include "Iterator/reverse_iterator.hpp"
 #include "Tree/tree.hpp"
+#include "Utils/enable_if.hpp"
+#include "Utils/is_integral.hpp"
 
 namespace ft {
 
-	template < class Key, class Type, class Compare = std::less<Key>,
-			class Alloc = std::allocator<Key>,
-			class Container = ft::RedBlackTree< Key, Alloc > >
+	template < class Key, class Compare = std::less<Key>,
+			class Alloc = std::allocator<Key> >
 	class set {
+
+		typedef	ft::RedBlackTree< RedBlackTreeTraits < Key, Compare, Alloc > >	Container;
+
 	private:
 		Container	_c;
+
 	public:
 
 		//_1_Member_types_______________________________________________________________________________________________
@@ -26,8 +31,8 @@ namespace ft {
 		rebind<valueType>::other						allocType;
 		typedef typename Alloc::template
 		rebind<valueType>::other::pointer				allocPtr;
-		typedef set <Key, Compare, Alloc>				thisType;
-		typedef Type									type;
+		typedef set <Key, Compare, Alloc>				Self;
+		typedef Key										type;
 		typedef Alloc									allocator;
 		typedef typename Alloc::size_type				sizeType;
 		typedef typename Alloc::difference_type			diffType;
@@ -43,18 +48,17 @@ namespace ft {
 		//_2_Constructors_______________________________________________________________________________________________
 
 		explicit	set(const Compare& comp = Compare(), const Alloc& allocator = Alloc()): _c(comp, allocator) {}
-		explicit	set(const Container& Cont):	_c(Cont) {}
 		template < class Iter >
 		set(Iter first, Iter last, const Compare& comp = Compare(), const Alloc& A = Alloc(),
-		typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr): _c(A)
-				{
-						if (first == last)
-						return ;
-						for (; first != last; ++first)
-						_c.insert(*first);
-				}
-		explicit set(const thisType& other): _c(other._c) {}
-		~set() { _c.clear(); }
+		typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr): _c(comp, A)
+		{
+				if (first == last)
+					return ;
+				for (; first != last; ++first)
+					_c.insert(*first);
+		}
+		explicit set(const Self& other): _c(other._c) {}
+		~set() { clear(); }
 
 
 		//_3_Capacity___________________________________________________________________________________________________
@@ -72,6 +76,18 @@ namespace ft {
 		const_iterator			end() const				{ return _c.end(); }
 
 
+		void	clear()	{ _c.clear(); }
+		void	insert(const valueType& X) { _c.insert(X); }
+
+		template < class Iter >
+		void	insert(Iter first, Iter last,
+					   typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr)
+		{
+			if (first == last)
+				return ;
+			for (; first != last; ++first)
+				_c.insert(*first);
+		}
 
 	};
 }
