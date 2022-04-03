@@ -24,8 +24,9 @@ namespace ft {
 
 		//_1_Member_types_______________________________________________________________________________________________
 
-		typedef typename Container::valueType		valueType;
-		typedef typename Container::sizeType		sizeType;
+		typedef Container							containerType;
+		typedef typename Container::value_type		value_type;
+		typedef typename Container::size_type		size_type;
 
 		//_2_Constructors_______________________________________________________________________________________________
 
@@ -37,19 +38,20 @@ namespace ft {
 		//_3_Capacity___________________________________________________________________________________________________
 
 		bool				empty() const	{ return _c.empty(); }
-		sizeType			size() const	{ return _c.size(); }
+		size_type			size() const	{ return _c.size(); }
 
 		//_4_Element_access_____________________________________________________________________________________________
 
-		valueType&			top()			{ return _c.back(); }
-		const valueType&	top() const		{ return _c.back(); }
+		value_type&			top()			{ return _c.back(); }
+		const value_type&	top() const		{ return _c.back(); }
 
 		//_5_Modifiers__________________________________________________________________________________________________
 
-		void				push(const valueType& X)						{ _c.push_back(X); }
+		void				push(const value_type& X)						{ _c.push_back(X); }
 		void				pop()											{ _c.pop_back(); }
 		bool 				eq(const stack<Type, Container>& other) const	{ return (_c == other._c); }
 		bool 				less(const stack<Type, Container>& other) const	{ return (_c < other._c); }
+		void 				swap(const stack<Type, Container>& other)		{ _c.swap(other._c); }
 	};
 
 	template < class Type, class C > inline

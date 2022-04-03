@@ -14,10 +14,10 @@ namespace ft {
 		pair(): first(A()), second(B()) {}
 
 		template < class T1, class T2 >
-		pair(const pair<T1, T2>& other): first(other.first), second(other.second) {}
+		pair(pair<T1, T2> const& other): first(other.first), second(other.second) {}
 		pair(const A& X, const B& Y): first(X), second(Y) {}
 
-		pair&	operator=(const pair& other)
+		pair&	operator=(pair const& other)
 		{
 			if (this == &other)
 				return *this;
@@ -26,7 +26,7 @@ namespace ft {
 			return *this;
 		}
 
-		void	swap(const pair& other)
+		void	swap(pair const& other)
 		{
 			ft::pair<A, B>	tmp(other);
 
@@ -43,37 +43,37 @@ namespace ft {
 	}
 
 	template < class T1, class T2 >
-	bool	operator==(const pair<T1, T2>& X, const pair<T1, T2>& Y)
+	bool	operator==(pair<T1, T2> const& X, pair<T1, T2> const& Y)
 	{
-		return (X._first == Y._first && X._second == Y._second);
+		return (X.first == Y.first && X.second == Y.second);
 	}
 
 	template < class T1, class T2 >
-	bool	operator!=(const pair<T1, T2>& X, const pair<T1, T2>& Y)
+	bool	operator!=(pair<T1, T2> const& X, pair<T1, T2> const& Y)
 	{
 		return !(X == Y);
 	}
 
 	template < class T1, class T2 >
-	bool	operator<(const pair<T1, T2>& X, const pair<T1, T2>& Y)
+	bool	operator<(pair<T1, T2> const& X, pair<T1, T2> const& Y)
 	{
-		return (X._first < Y._first || (!(Y._first < X._first) && X._second < Y._second));
+		return (X.first < Y.first || (!(Y.first < X.first) && X.second < Y.second));
 	}
 
 	template < class T1, class T2 >
-	bool	operator>(const pair<T1, T2>& X, const pair<T1, T2>& Y)
+	bool	operator>(pair<T1, T2> const& X, pair<T1, T2> const& Y)
 	{
 		return Y < X;
 	}
 
 	template < class T1, class T2 >
-	bool	operator>=(const pair<T1, T2>& X, const pair<T1, T2>& Y)
+	bool	operator>=(pair<T1, T2> const& X, pair<T1, T2> const& Y)
 	{
 		return !(X < Y);
 	}
 
 	template < class T1, class T2 >
-	bool	operator<=(const pair<T1, T2>& X, const pair<T1, T2>& Y)
+	bool	operator<=(pair<T1, T2> const& X, pair<T1, T2> const& Y)
 	{
 		return !(Y < X);
 	}

@@ -9,9 +9,13 @@
 #include "../Utils/pair.hpp"
 #include "../Iterator/tree_iterator.hpp"
 #include "tree_traits.hpp"
+#include "../Utils/enable_if.hpp"
+#include "../Utils/is_integral.hpp"
+#include "../Utils/equal.hpp"
+#include "../Utils/lexicographical_compare.hpp"
 
-#define RED	"\033[31m"
-#define DEF	"\033[0m"
+#define RED		"\033[31m"
+#define DEF		"\033[0m"
 
 namespace ft {
 
@@ -23,12 +27,12 @@ namespace ft {
 		typedef	RedBlackTree < RedBlackTreeTraits >					Self;
 
 		typedef typename RedBlackTreeTraits::Data					Data;
-		typedef typename RedBlackTreeTraits::Node					NodeType;
-		typedef typename RedBlackTreeTraits::key_type				KeyType;
-		typedef typename RedBlackTreeTraits::value_type				ValueType;
+		typedef typename RedBlackTreeTraits::Node					node_type;
+		typedef typename RedBlackTreeTraits::key_type				key_type;
+		typedef typename RedBlackTreeTraits::value_type				value_type;
 		typedef typename RedBlackTreeTraits::key_compare			key_compare;
-		typedef typename RedBlackTreeTraits::sizeType				sizeType;
-		typedef typename RedBlackTreeTraits::diffType				diffType;
+		typedef typename RedBlackTreeTraits::size_type				size_type;
+		typedef typename RedBlackTreeTraits::difference_type		difference_type;
 
 		typedef typename RedBlackTreeTraits::nodePtr				nodePtr;
 		typedef typename RedBlackTreeTraits::const_nodePtr			const_nodePtr;
@@ -40,8 +44,10 @@ namespace ft {
 		typedef typename RedBlackTreeTraits::allocator_for_node		allocNode;
 
 
-		typedef ft::tree_iterator < Data, Self, BiDirIter <NodeType, diffType, nodePtr, nodeRef> >				iterator;
-		typedef ft::tree_iterator < Data, Self, BiDirIter <NodeType, diffType, const_nodePtr, const_nodeRef> >	const_iterator;
+		typedef ft::tree_iterator < Data, Self, BiDirIter <node_type, difference_type, nodePtr, nodeRef> >				iterator;
+		typedef ft::tree_iterator < Data, Self, BiDirIter <node_type, difference_type, const_nodePtr, const_nodeRef> >	const_iterator;
+//		typedef ft::reverse_iterator < iterator >																		reverse_iterator;
+//		typedef ft::reverse_iterator < const_iterator >																	const_reverse_iterator;
 
 
 		//_2_Constructors_______________________________________________________________________________________________
@@ -57,7 +63,8 @@ namespace ft {
 		RedBlackTree(Self const& other):	_allocator(allocPair()),
 											_allocator_node(allocNode()),
 											_key_compare(key_compare()),
-											_root(nullptr), _end(nullptr) {
+											_root(nullptr), _end(nullptr)
+		{
 			if (this->_root != nullptr || other.size() == 0)
 				clear();
 			if (other._root != nullptr) {
@@ -65,19 +72,19 @@ namespace ft {
 				Copy(this->_root, other._root);
 			}
 		}
-		~RedBlackTree() { Clear(_root); }
+		~RedBlackTree() { clear(); }
 
 		//_3_Capacity___________________________________________________________________________________________________
-		sizeType				size()	const			{ return Size(_root); }
-		sizeType				max_size()	const		{ return _allocator_node.max_size(); }
+		size_type				size()	const			{ return Size(_root); }
+		size_type				max_size()	const		{ return _allocator_node.max_size(); }
 		bool 					empty() const			{ return (size() == 0); }
-		allocPair				get_allocator() const	{ return _allocator; } // todo : maybe allocNode?
+		allocPair				get_allocator() const	{ return _allocator; }
 
 		//_4_Element_access_____________________________________________________________________________________________
 		iterator				begin()					{ return iterator(Min(this->_root), this); }
-		const_iterator			begin()	const			{ return const_iterator(Min(this->_root), this); }
+		const_iterator			cbegin()	const		{ return const_iterator(Min(this->_root), this); }
 		iterator				end()					{ return iterator(this->_end, this); }
-		const_iterator			end() const				{ return const_iterator(this->_end, this); }
+		const_iterator			cend() const			{ return const_iterator(this->_end, this); }
 //		const_reverse_iterator	rend() const			{ return const_reverse_iterator(this->begin()); }
 //		reverse_iterator		rend()					{ return reverse_iterator(this->begin()); }
 //		const_reverse_iterator	rbegin() const			{ return const_reverse_iterator(this->end()); }
@@ -85,17 +92,30 @@ namespace ft {
 		nodePtr 				min() const				{ return Min(this->_root); }
 		nodePtr 				max() const				{ return Max(this->_root); }
 
-		KeyType&				getKey(const nodePtr & position) const { return RedBlackTreeTraits::GetKey(position); }
-		const KeyType&			getKey(const Data& position_data) const { return RedBlackTreeTraits::GetKey(position_data); }
-		ValueType&				getValue(const nodePtr & position) const { return RedBlackTreeTraits::GetValue(position); }
-		const ValueType&		getValue(const Data& position_data) const { return RedBlackTreeTraits::GetValue(position_data); }
+		key_type&				getKey(nodePtr position) const				{ return RedBlackTreeTraits::GetKey(position); }
+		key_type const&			getKey(Data const& position_data) const		{ return RedBlackTreeTraits::GetKey(position_data); }
+		value_type&				getValue(nodePtr position) const			{ return RedBlackTreeTraits::GetValue(position); }
+		value_type const&		getValue(Data const& position_data) const	{ return RedBlackTreeTraits::GetValue(position_data); }
 
-		ValueType&				at(const KeyType& key) throw(std::out_of_range) // same as tree[N]
+		value_type&				at(const key_type& key) throw(std::out_of_range) // same as tree[N]
 		{
 			if (find(key) == this->end())
 				throw std::out_of_range("out of range");
 			return getValue(Find(key, this->_root));
 		}
+		const value_type&		at(const key_type& key) const throw(std::out_of_range) // same as tree[N]
+		{
+			if (find(key) == this->end())
+				throw std::out_of_range("out of range");
+			return getValue(Find(key, this->_root));
+		}
+
+		value_type&				operator[]( const key_type& key)
+		{
+			if (find(key) == this->end())
+				insert(ft::make_pair(key, value_type()));
+			return getValue(Find(key, this->_root)); }
+
 
 		//_5_Member_functions___________________________________________________________________________________________
 		//__Assignment_operator_____________________
@@ -105,7 +125,7 @@ namespace ft {
 				;
 			else if (this->_root || other.size() == 0)
 				clear(); // destroy elements
-			else if (other._root != nullptr) {
+			if (other._root != nullptr) {
 				this->_root = Construct(*(other._root->_data));
 				Copy(this->_root, other._root);
 			}
@@ -114,13 +134,16 @@ namespace ft {
 		};
 
 		//_6_Modifiers__________________________________________________________________________________________________
-		void							clear()	{
+		void						clear()
+		{
 			Clear(this->_root);
+			this->_root = nullptr;
 			Clear(this->_end);
+			this->_end = nullptr;
 		}
 		//__Insert__________________________________________
-		iterator						insert(const Data& X, iterator position) { return (insert(X).first); }
-		ft::pair<iterator, bool>		insert(const Data& X)
+		iterator					insert(Data const& X, iterator position) { (void)position ; return (insert(X).first); }
+		ft::pair<iterator, bool>	insert(Data const& X)
 		{
 			if (find(getKey(X)) != this->end())
 				return (ft::make_pair(find(getKey(X)), true));
@@ -130,37 +153,102 @@ namespace ft {
 
 			return (ft::make_pair(iterator(newNode, this), true));
 		}
-		//__Erase___________________________________________
-		void 		erase(iterator position) { this->_root = Erase(this->_root, position); }
-		sizeType	erase(const KeyType& key) {
+		template < class Iter >
+		void						insert(Iter first, Iter last,
+		typename ft::enable_if<!ft::is_integral<Iter>::value >::type* = 0)
+		{
+			for (; first != last; first++)
+				insert(*first);
+		}
 
-			sizeType	size = this->size();
-			this->_root = Erase(this->_root, find(key));
+		//__Erase___________________________________________
+		void 		erase(iterator position) { _root = Remove(this->_root, position); }
+		size_type	erase(const key_type& key)
+		{
+
+			size_type	size = this->size();
+			_root = Remove(this->_root, Find(key, this->_root));
 			return (size == this->size());
 		}
-		void		erase(iterator first, iterator last) {
+		void		erase(iterator first, iterator last)
+		{
 			for (; first != last; ++first)
 				erase(first);
 		}
 
 		//_7_LookUp_____________________________________________________________________________________________________
-		iterator		find(KeyType const& key) 		{ return iterator(Find(key, this->_root), this); }
-		const_iterator	find(KeyType const& key) const	{ return const_iterator(Find(key, this->_root), this); }
-		sizeType		count(KeyType const& key) const	{ return (sizeType)(Find(key, this->_root) != nullptr); }
+		iterator		find(key_type const& key)				{ return iterator(Find(key, this->_root), this); }
+		const_iterator	find(key_type const& key) const			{ return const_iterator(Find(key, this->_root), this); }
+		size_type		count(key_type const& key) const		{ return (size_type)(Find(key, this->_root) != nullptr); }
+		bool 			contains(key_type const& key) const		{ return Find(key, this->_root) != nullptr; }
+
+		iterator		lower_bound(key_type const& key) {
+			iterator	it = begin();
+			for (; it != end() && _key_compare(getKey(*it), key); ++it) {}
+			return it;
+		}
+		iterator		upper_bound(key_type const& key) {
+			iterator	it = lower_bound(key);
+			return getKey(*it) == key && it != end() ? ++it : it;
+		}
+		const_iterator	lower_bound(key_type const& key) const {
+			const_iterator	it = cbegin();
+			for (; it != cend() && _key_compare(getKey(*it), key); ++it) {}
+			return it;
+		}
+		const_iterator	upper_bound(key_type const& key) const {
+			const_iterator	it = lower_bound(key);
+			return getKey(*it) == key && it != cend() ? ++it : it;
+		}
+
+//		ft::pair<iterator, iterator>				equal_range(key_type const& key) {
+//			return ft::make_pair<iterator, iterator>(lower_bound(key), upper_bound(key));
+//		}
+		ft::pair<const_iterator, const_iterator>	equal_range(key_type const& key) const {
+			const_iterator	itLow = lower_bound(key);
+			const_iterator	itUp = upper_bound(key);
+			return ft::make_pair<const_iterator, const_iterator>(itLow, itUp);
+		}
+
+		//_8_Observers__________________________________________________________________________________________________
+		key_compare		key_comp() const	{ return _key_compare; }
+//		value_compare	value_comp() const	{ return _value_compare; }
+		void swap(Self &X) {(void)X;}
+
+
+		typedef struct	help {
+			std::string	s;
+			help*		next;
+		} help;
 
 		void	print()
 		{
-			printNode(_root);
+			std::cout << "ROOT\n";
+			printNode(_end, _root, 0, 0, false);
 			std::cout << "\n";
 		}
 
-		void	printNode(nodePtr& node)
+		void	printNode(nodePtr& parent, nodePtr& node, int depth, int rights, bool left)
 		{
+			if (depth) {
+				for (int i = 0; i < depth - 1; i++) {
+					if (rights-- > 0)
+						std::cout << "    ";
+					else if (parent != this->_root)
+						std::cout << " │  ";
+				}
+				if (parent) {
+					if (!left)
+						std::cout << " ├──";
+					else
+						std::cout << " └──";
+				}
+			}
+			PrintNode(node);
 			if (!node)
 				return ;
-			PrintNode(node);
-			printNode(node->_left);
-			printNode(node->_right);
+			printNode(node, node->_right, depth + 1, rights, false);
+			printNode(node, node->_left, depth + 1, rights + 2,true);
 		}
 
 		bool	getColor(const nodePtr& node) const
@@ -273,6 +361,72 @@ namespace ft {
 			setColor(this->_root, Black);
 		}
 
+		void fixRemove(nodePtr& position, nodePtr node, nodePtr parent) {
+
+			nodePtr	otherNode;
+			printf("111\n");
+			while ((!node) || (node->_color == Black && node != position)) {
+				if (parent && parent->_left == node) {
+
+					otherNode = parent->_right;
+					if (otherNode->_color == Red) {
+						otherNode->_color = Black;
+						parent->_color = Red;
+						rotateLeft(parent);
+						otherNode = parent->_right;
+					}
+					else {
+
+						if (!otherNode->_right || otherNode->_right->_color == Black) {
+							otherNode->_left->_color = Black;
+							otherNode->_color = Red;
+							rotateRight(otherNode);
+							otherNode = parent->_right;
+						}
+
+						otherNode->_color = parent->_color;
+						parent->_color = Black;
+						otherNode->_right->_color = Black;
+						rotateLeft(parent);
+						node = position;
+						break ;
+					}
+				}
+				else {
+					otherNode = parent->_left;
+					if (otherNode->_color == Red) {
+						otherNode->_color = Black;
+						parent->_color = Red;
+						rotateRight(parent);
+						otherNode = parent->_left;
+					}
+					if (!otherNode->_left || (otherNode->_left->_color == Black &&
+					(!otherNode->_right || otherNode->_right->_color == Black))) {
+						otherNode->_color = Red;
+						node = parent;
+						parent = node->_parent;
+					}
+					else {
+						if (!otherNode->_left || otherNode->_left->_color == Black) {
+							otherNode->_right->_color = Black;
+							otherNode->_color = Red;
+							rotateLeft( otherNode);
+							otherNode = parent->_left;
+						}
+
+						otherNode->_color = parent->_color;
+						parent->_color = Black;
+						otherNode->_left->_color = Black;
+						rotateRight(parent);
+						node = position;
+						break;
+					}
+				}
+			}
+			if (node)
+				node->_color = Black;
+		}
+
 
 	private:
 		allocPair		_allocator;
@@ -292,15 +446,8 @@ namespace ft {
 		// Allocates memory and constructs new Node
 		// with data = *X
 		nodePtr	Construct(const Data& X, nodePtr parent = nullptr) {
-//			nodePtr newNode = new treeNode<Data>();
-//			newNode->_parent = parent;
-//			newNode->_left = nullptr;
-//			newNode->_right = nullptr;
-//			newNode->_data = nullptr;
-//			newNode->_color = Red;
-//			newNode->_data = new Data(X);
 			nodePtr newNode = _allocator_node.allocate(1);
-			_allocator_node.construct(newNode, NodeType());
+			_allocator_node.construct(newNode, node_type());
 			newNode->_parent = parent;
 			newNode->_left = nullptr;
 			newNode->_right = nullptr;
@@ -330,7 +477,7 @@ namespace ft {
 			}
 			position->_data = nullptr;
 			_allocator_node.destroy(position);
-//			_allocator_node.deallocate(position, 1);
+			_allocator_node.deallocate(position, 1);
 			position = nullptr;
 		}
 
@@ -361,27 +508,32 @@ namespace ft {
 			return position;
 		}
 
-		nodePtr	Remove(nodePtr& node, nodePtr& position) {
-			nodePtr child, parent;
+		nodePtr	Remove(nodePtr node, nodePtr position) {
+
+			nodePtr	child, parent, replace;
 			bool	color;
 
+			// если не является листом дерева
 			if (node->_left && node->_right) {
-				nodePtr	replace = node->_right;
-				while (replace->_left)
+
+				replace = node->_right;
+				while (replace->_left) // ищем замену в левом поддереве правого ребенка
 					replace = replace->_left;
-				if (node->_parent) {
-					if (node->_parent->_left == node)
+
+				if (node->_parent == nullptr) // если удаляем корень
+					position = replace;
+				else { // если не корень
+					if (node->_parent->_left == node) // перекидываем указатель у родителя на замену
 						node->_parent->_left = replace;
 					else
 						node->_parent->_right = replace;
 				}
-				else
-					position = replace;
+
 				child = replace->_right;
 				parent = replace->_parent;
-				color = getColor(replace);
+				color = replace->_color;
 
-				if (parent == node)
+				if (parent == node) //  если родитель переемника - удаляемый узел
 					parent = replace;
 				else {
 					if (child)
@@ -395,13 +547,36 @@ namespace ft {
 				replace->_left = node->_left;
 				node->_left->_parent = replace;
 				if (color == Black)
-					fixViolation();
+					fixRemove(position, child, parent);
 				Destroy(node);
-				return ;
+				return position;
 			}
+			if (node->_left)
+				child = node->_left;
+			else
+				child = node->_right;
+
+			parent = node->_parent;
+			color = node->_color;
+
+			if (child)
+				child->_parent = parent;
+			if (parent) {
+				if (node == parent->_left)
+					parent->_left = child;
+				else
+					parent->_right = child;
+			}
+			else
+				position = child;
+
+			if (color == Black)
+				fixRemove(position, child, parent);
+			Destroy(node);
+			return position;
 		}
 
-		nodePtr		Find(const KeyType& key, const nodePtr& position) const {
+		nodePtr		Find(const key_type& key, const nodePtr& position) const {
 			if (position == nullptr)
 				return position;
 			return	_key_compare(key, getKey(position)) ? Find(key, position->_left) :
@@ -409,7 +584,7 @@ namespace ft {
 					position;
 		}
 
-		sizeType	Size(const nodePtr& position) const {
+		size_type	Size(const nodePtr& position) const {
 			return position != nullptr ? Size(position->_right) + Size(position->_left) + 1 : 0 ;
 		}
 
@@ -424,25 +599,63 @@ namespace ft {
 		void	PrintNode(nodePtr& node)
 		{
 			if (!node)
-				return;
-//			if (node->_parent) {
-//				node->_parent->_color == Red ? std::cout << RED : std::cout << DEF;
-//				std::cout << "parent: " << *(node->_parent->_data->_first) << ", ";
-////			}
-			if (node->_data) {
+				std::cout << "(null)" << DEF;
+			else if (node->_data) {
 				node->_color == Red ? std::cout << RED : std::cout << DEF;
-				std::cout << "current: " << getKey(node) << ", ";
+				std::cout << "[" << getKey(node) << "]" << DEF;
 			}
-			if (node->_left) {
-				node->_left->_color == Red ? std::cout << RED : std::cout << DEF;
-				std::cout << "left: " << getKey(node->_left) << ", ";
-			}
-			if (node->_right) {
-				node->_right->_color == Red ? std::cout << RED : std::cout << DEF;
-				std::cout << "right: " << getKey(node->_right);
-			}
+//			if (node->_left) {
+//				node->_left->_color == Red ? std::cout << RED : std::cout << DEF;
+//				std::cout << "left: " << getKey(node->_left) << ", ";
+//			}
+//			if (node->_right) {
+//				node->_right->_color == Red ? std::cout << RED : std::cout << DEF;
+//				std::cout << "right: " << getKey(node->_right);
+//			}
 			std::cout << "\n";
 		}
 
 	};
+
+	template < class RBT > inline
+	bool operator==(const RedBlackTree<RBT> &X, const RedBlackTree<RBT> &Y)
+	{
+		return (X.size() == Y.size() && ft::equal(X.cbegin(), X.cend(), Y.cbegin()));
+	}
+
+	template < class RBT > inline
+	bool operator!=(const RedBlackTree<RBT> &X, const RedBlackTree<RBT> &Y)
+	{
+		return !(X == Y);
+	}
+
+	template < class RBT > inline
+	bool operator<(const RedBlackTree<RBT> &X, const RedBlackTree<RBT> &Y)
+	{
+		return ft::lexicographical_compare(X.cbegin(), X.cend(), Y.cbegin(), Y.cend());
+	}
+
+	template < class RBT > inline
+	bool operator>(const RedBlackTree<RBT> &X, const RedBlackTree<RBT> &Y)
+	{
+		return Y < X;
+	}
+
+	template < class RBT > inline
+	bool operator<=(const RedBlackTree<RBT> &X, const RedBlackTree<RBT> &Y)
+	{
+		return !(Y < X);
+	}
+
+	template < class RBT > inline
+	bool operator>=(const RedBlackTree<RBT> &X, const RedBlackTree<RBT> &Y)
+	{
+		return !(X < Y);
+	}
+
+	template < class RBT > inline
+	void swap(RedBlackTree<RBT> &X, RedBlackTree<RBT> &Y)
+	{
+		X.swap(Y);
+	}
 }

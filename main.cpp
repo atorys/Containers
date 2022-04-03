@@ -59,11 +59,40 @@ int main()
 	{
 
 		ft::RedBlackTree< ft::RedBlackTreeTraits<int, std::greater<int> > >	tree;
+		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::less<int> > >	tree2;
 
-		tree.insert(10);
-		tree.insert(11);
-		tree.print();
-		tree.print();
+
+		tree2.insert(ft::make_pair(12, 234));
+		tree2.insert(ft::make_pair(85, 56));
+		tree2.insert(ft::make_pair(107, 56));
+		tree2.insert(ft::make_pair(8, 56));
+		tree2.insert(ft::make_pair(15, 56));
+		tree2.insert(ft::make_pair(78, 56));
+//		tree2.insert(ft::make_pair(4, 56));
+		tree2.insert(ft::make_pair(9, 56));
+		tree2.insert(ft::make_pair(99, 56));
+		tree2.insert(ft::make_pair(100, 56));
+		tree2.insert(ft::make_pair(101, 56));
+		tree2.insert(ft::make_pair(758, 56));
+//		tree2.insert(ft::make_pair(9, 56));
+//		tree2.insert(ft::make_pair(8, 94));
+
+//		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it;
+//		ft::pair<ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator, ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator> rt = tree2.equal_range(2);
+		tree2.print();
+//		tree2.erase(8);
+//		tree2.print();
+
+
+//		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::reverse_iterator it;
+
+//		it = tree2.rend();
+//		std::cout << (*(*it)).first;
+//		tree2.print();
+//		tree.insert(10);
+//		tree.insert(11);
+//		tree.print();
+//		tree.print();
 //		tree.insert(10);
 //		tree.insert(6);
 //		tree.insert(45);
@@ -74,7 +103,7 @@ int main()
 //		tree.insert(15);
 //		tree.insert(22);
 //		tree.insert(6);
-		tree.print();
+//		tree.print();
 //
 //		std::cout << tree.at(10);
 
@@ -95,14 +124,14 @@ int main()
 //		for (; it != tree.end(); --it)
 //			std::cout << *(it) << "\n";
 
-		ft::map<int, std::string> map;
-		ft::map<int, std::string, std::greater<int> > map2;
-		ft::map<int, std::string, std::greater<int> >::iterator it2;
+//		ft::map<int, std::string> map;
+//		ft::map<int, std::string, std::greater<int> > map2;
+//		ft::map<int, std::string, std::greater<int> >::iterator it2;
 //		std::map<int, int> map2;
 
-		it2	= map.begin();
-
-//		map.insert(ft::make_pair(1, "34"));
+//		it2	= map2.begin();
+//
+//		map2.insert(ft::make_pair(1, "34"));
 //		map.insert(ft::make_pair(3, "97"));
 //		map.insert(ft::make_pair(0, "2"));
 //

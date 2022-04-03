@@ -102,7 +102,7 @@ namespace ft {
 	}
 
 	template < class RandIter > inline
-	reverse_iterator<RandIter>	operator+(typename iterator_traits<RandIter>::diffType N,
+	reverse_iterator<RandIter>	operator+(typename iterator_traits<RandIter>::difference_type N,
 												  const reverse_iterator<RandIter>& x)
 	{
 		return (x - N);

@@ -38,35 +38,35 @@ namespace ft {
 		//_1_Member_types_______________________________________________________________________________________________
 
 		typedef vector <Type, Alloc>					Self;
-		typedef typename Alloc::size_type				sizeType;
-		typedef typename Alloc::difference_type			diffType;
-		typedef typename Alloc::value_type				valueType;
+		typedef typename Alloc::size_type				size_type;
+		typedef typename Alloc::difference_type			difference_type;
+		typedef typename Alloc::value_type				value_type;
 
-		typedef typename Alloc::pointer					ptr;
-		typedef typename Alloc::reference				ref;
-		typedef typename Alloc::const_pointer			const_ptr;
-		typedef typename Alloc::const_reference			const_ref;
+		typedef typename Alloc::pointer					pointer;
+		typedef typename Alloc::reference				reference;
+		typedef typename Alloc::const_pointer			const_pointer;
+		typedef typename Alloc::const_reference			const_reference;
 
-		typedef ft::random_access_iterator < RandIter <Type, diffType, ptr, ref> >				iterator;
-		typedef ft::random_access_iterator < RandIter <Type, diffType, const_ptr, const_ref> >	const_iterator;
-		typedef ft::reverse_iterator < iterator >												reverse_iterator;
-		typedef ft::reverse_iterator < const_iterator >											const_reverse_iterator;
+		typedef ft::random_access_iterator < RandIter <Type, difference_type, pointer, reference> >				iterator;
+		typedef ft::random_access_iterator < RandIter <Type, difference_type, const_pointer, const_reference> >	const_iterator;
+		typedef ft::reverse_iterator < iterator >															reverse_iterator;
+		typedef ft::reverse_iterator < const_iterator >														const_reverse_iterator;
 
 		//_2_Constructors_______________________________________________________________________________________________
 
 		explicit	vector(const Alloc& A = Alloc()) : _allocator(A) { Buy(0); }
 
-		explicit	vector(sizeType N)
+		explicit	vector(size_type N)
 		{
 			if (Buy(N))
 				_last = Fill(_first, N, Type());
 		}
 
-		vector(sizeType N, const Type& X) {
+		vector(size_type N, const Type& X) {
 			if (Buy(N))
 				_last = Fill(_first, N, X);
 		}
-		vector(sizeType N, const Type& X, const Alloc& A = Alloc()) : _allocator(A)
+		vector(size_type N, const Type& X, const Alloc& A = Alloc()) : _allocator(A)
 		{
 			if (Buy(N))
 				_last = Fill(_first, N, X);
@@ -88,7 +88,7 @@ namespace ft {
 		template < class Iter >
 		vector(Iter first, Iter last, typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr)
 		{
-			sizeType N = (sizeType)first;
+			size_type N = (size_type)first;
 			if (Buy(N))
 				_last = Fill(_first, N, (Type)last);
 		}
@@ -96,22 +96,22 @@ namespace ft {
 
 		//_3_Capacity___________________________________________________________________________________________________
 
-		sizeType				size() const			{ return _first == NULL ? 0 : _last - _first; } // size of active array
-		sizeType				max_size() const		{ return _allocator.max_size(); } // size of max allocation
-		sizeType				capacity() const		{ return (_first == NULL ? 0 : _end - _first); } // size of allocated array
+		size_type				size() const			{ return _first == NULL ? 0 : _last - _first; } // size of active array
+		size_type				max_size() const		{ return _allocator.max_size(); } // size of max allocation
+		size_type				capacity() const		{ return (_first == NULL ? 0 : _end - _first); } // size of allocated array
 		bool					empty() const			{ return (this->size() == 0); }
 		Alloc					get_allocator() const	{ return _allocator; }
 
 		//__Reserve___________________________________________________
 		// checks that the memory for at least N elements in allocated
 		// if not reallocates enough memory
-		void					reserve(sizeType N)
+		void					reserve(size_type N)
 		{
 			if (this->max_size() < N)
 				exception_length();
 			else if (this->capacity() < N)
 			{
-				ptr copy = _allocator.allocate(N);
+				pointer copy = _allocator.allocate(N);
 				try {
 					Copy(this->begin(), this->end(), copy);
 				}
@@ -132,29 +132,29 @@ namespace ft {
 
 		//_4_Element_access_____________________________________________________________________________________________
 
-		iterator				begin()					{ return iterator(_first); }
-		const_iterator			begin() const			{ return const_iterator(_first); }
-		iterator				end()					{ return iterator(_last); }
-		const_iterator			end() const				{ return const_iterator(_last); }
-		reverse_iterator		rbegin()				{ return reverse_iterator(this->end()); }
-		const_reverse_iterator	rbegin() const			{ return const_reverse_iterator(this->end()); }
-		reverse_iterator		rend()					{ return reverse_iterator(this->begin()); }
-		const_reverse_iterator	rend() const			{ return const_reverse_iterator(this->begin()); }
+		iterator					begin()							{ return iterator(_first); }
+		const_iterator				begin() const					{ return const_iterator(_first); }
+		iterator					end()							{ return iterator(_last); }
+		const_iterator				end() const						{ return const_iterator(_last); }
+		reverse_iterator			rbegin()						{ return reverse_iterator(this->end()); }
+		const_reverse_iterator		rbegin() const					{ return const_reverse_iterator(this->end()); }
+		reverse_iterator			rend()							{ return reverse_iterator(this->begin()); }
+		const_reverse_iterator		rend() const					{ return const_reverse_iterator(this->begin()); }
 
-		const_ref				operator[](sizeType N) const	{ return *(this->begin() + N); } // vector[N]
-		ref						operator[](sizeType N)			{ return *(this->begin() + N); }
-		ref 					front()							{ return *(this->begin()); } // *vector[first]
-		const_ref				front() const					{ return *(this->begin()); }
-		ref 					back()							{ return *(this->end() - 1); } // *vector[last]
-		const_ref				back() const					{ return *(this->end() - 1); }
+		const_reference				operator[](size_type N) const	{ return *(this->begin() + N); } // vector[N]
+		reference					operator[](size_type N)			{ return *(this->begin() + N); }
+		reference 					front()							{ return *(this->begin()); } // *vector[first]
+		const_reference				front() const					{ return *(this->begin()); }
+		reference 					back()							{ return *(this->end() - 1); } // *vector[last]
+		const_reference				back() const					{ return *(this->end() - 1); }
 
-		ref			at(sizeType N) throw(std::out_of_range) // same as vector[N]
+		reference			at(size_type N) throw(std::out_of_range) // same as vector[N]
 		{
 			if (this->size() <= N)
 				exception_range();
 			return *(this->begin() + N);
 		}
-		const_ref	at(sizeType N) const throw(std::out_of_range)// same as vector[N]
+		const_reference		at(size_type N) const throw(std::out_of_range)// same as vector[N]
 
 		{
 			if (this->size() <= N)
@@ -171,7 +171,7 @@ namespace ft {
 			else if (other.size() == 0)
 				Clear(); // destroy elements
 			else if (other.size() <= this->size()) {
-				ptr tmp_end = ft::copy(other.begin(), other.end(), _first);
+				pointer tmp_end = ft::copy(other.begin(), other.end(), _first);
 				Destroy(tmp_end, this->_last); // destroy unused cells
 				_last = _first + other.size();
 			}
@@ -194,7 +194,7 @@ namespace ft {
 		void assign(Iter first, Iter last, typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr)
 		{
 			erase(this->begin(), this->end());
-			insert(this->begin(), (sizeType)first, (Type)last);
+			insert(this->begin(), (size_type)first, (Type)last);
 		}
 
 		template <class Iter> // for iterators
@@ -208,17 +208,17 @@ namespace ft {
 		//__Insert__________________________________________________________________
 		iterator	insert(iterator position, const Type& X) throw(std::length_error)
 		{
-			sizeType offsetIndex = this->size() == 0 ? 0 : position - this->begin();
-			this->insert(position, (sizeType)1, X);
+			size_type offsetIndex = this->size() == 0 ? 0 : position - this->begin();
+			this->insert(position, (size_type)1, X);
 			return (this->begin() + offsetIndex); // position of inserted element
 		}
 
 		// fill : inserts count values before position
-		void 	insert(iterator position, sizeType count, const Type& X) throw(std::length_error)
+		void 	insert(iterator position, size_type count, const Type& X) throw(std::length_error)
 		{
-			sizeType	N = this->capacity();
-			ptr			newFirst;
-			ptr			newLast;
+			size_type		N = this->capacity();
+			pointer			newFirst;
+			pointer			newLast;
 
 			if (count == 0) // no element to insert
 				return ;
@@ -248,7 +248,7 @@ namespace ft {
 				_first = newFirst;
 			}
 			//
-			else if ((sizeType)(this->end() - position) < count) {
+			else if ((size_type)(this->end() - position) < count) {
 				// смещаем элементы с [position; end] на [position + count; end]
 				// чтобы вставить новые и не потерять старые значения
 				Copy(position, this->end(), position.base() + count);
@@ -281,15 +281,15 @@ namespace ft {
 		template < class Iter > // for integral Iter
 		void	insert(iterator position, Iter First, Iter Last, typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr)
 		{
-			insert(position, (sizeType)First, (Type)Last);
+			insert(position, (size_type)First, (Type)Last);
 		}
 
 		template < class Iter > // for iterators
 		void	insert(iterator position, Iter First, Iter Last, typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr) {
-			sizeType	count = 0;
-			sizeType	N = this->capacity();
-			ptr			newFirst;
-			ptr			newLast;
+			size_type		count = 0;
+			size_type		N = this->capacity();
+			pointer			newFirst;
+			pointer			newLast;
 
 			ft::distance(First, Last, count); // iter difference -> counter inserted elements
 			if (count == 0) // no elements
@@ -318,7 +318,7 @@ namespace ft {
 				_last = newFirst + this->size() + count;
 				_first = newFirst;
 			}
-			else if ((sizeType)(this->end() - position) < count) { //
+			else if ((size_type)(this->end() - position) < count) { //
 				Copy(position, this->end(), position.base() + count);
 				Iter Mid = First;
 				Mid += this->end() - position;
@@ -351,7 +351,7 @@ namespace ft {
 		iterator	erase(iterator First, iterator Last)
 		{
 			if (First != Last) { // active elements offset from [Last; End()] to First
-				ptr	newLast = ft::copy(Last, this->end(), First.base());
+				pointer	newLast = ft::copy(Last, this->end(), First.base());
 				Destroy(newLast, _last); // erasing tail
 				_last = newLast;
 			}
@@ -377,12 +377,12 @@ namespace ft {
 		}
 
 		//__Resize________________
-		void	resize(sizeType N)
+		void	resize(size_type N)
 		{
 			resize(N, Type());
 		}
 
-		void	resize(sizeType N, Type X)
+		void	resize(size_type N, Type X)
 		{
 			if (this->size() < N)
 				insert(this->end(), N - this->size(), X);
@@ -406,16 +406,16 @@ namespace ft {
 		}
 
 	protected:
-		Alloc	_allocator;
-		ptr		_first; // HEAD
-		ptr		_last;	// TAIL : position AFTER last active element if _first != 0
-		ptr		_end;	// END of allocated memory
+		Alloc		_allocator;
+		pointer		_first; // HEAD
+		pointer		_last;	// TAIL : position AFTER last active element if _first != 0
+		pointer		_end;	// END of allocated memory
 
 		/* uses allocator "Alloc" to allocate N * sizeof(Alloc::value_type)
 		 * bytes of uninitialized storage
 		 * an array of type Alloc::value_type[N] is created in the storage,
 		 * but none of its elements are constructed							*/
-		bool	Buy(sizeType N)
+		bool	Buy(size_type N)
 		{
 			_first = nullptr;
 			_last = nullptr;
@@ -429,7 +429,7 @@ namespace ft {
 		};
 
 		/* calls the destructor of the elements in the array [first, last) */
-		void 	Destroy(ptr first, ptr last)
+		void 	Destroy(pointer first, pointer last)
 		{
 			for (; first != last; first++)
 				_allocator.destroy(first);
@@ -449,9 +449,9 @@ namespace ft {
 
 		/* constructs an object of type "Type" in allocated uninitialized storage
 		 * pointed by "current" using placement-new */
-		ptr		Fill(ptr current, sizeType N, const Type& X)
+		pointer		Fill(pointer current, size_type N, const Type& X)
 		{
-			ptr begin = current;
+			pointer begin = current;
 			try {
 				for (; N > 0; --N, ++current)
 					_allocator.construct(current, X);
@@ -464,9 +464,9 @@ namespace ft {
 		};
 
 		template < class Iter >
-		ptr		Copy(Iter first, Iter last, ptr current)
+		pointer		Copy(Iter first, Iter last, pointer current)
 		{
-			ptr begin = current;
+			pointer begin = current;
 			try {
 				for (; first != last; ++current, ++first)
 					_allocator.construct(current, *first);

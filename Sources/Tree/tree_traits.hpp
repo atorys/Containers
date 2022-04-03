@@ -42,12 +42,12 @@ namespace ft {
 		rebind<Node >::other						allocator_for_node;
 
 
-		typedef typename Alloc::size_type				sizeType;
-		typedef typename Alloc::difference_type			diffType;
-		typedef typename Alloc::pointer					ptr;
-		typedef typename Alloc::reference				ref;
-		typedef typename Alloc::const_pointer			const_ptr;
-		typedef typename Alloc::const_reference			const_ref;
+		typedef typename Alloc::size_type				size_type;
+		typedef typename Alloc::difference_type			difference_type;
+		typedef typename Alloc::pointer					pointer;
+		typedef typename Alloc::reference				reference;
+		typedef typename Alloc::const_pointer			const_pointer;
+		typedef typename Alloc::const_reference			const_reference;
 
 		typedef typename Alloc::template
 		rebind<Node >::other::pointer			nodePtr;
@@ -58,10 +58,10 @@ namespace ft {
 		typedef typename Alloc::template
 		rebind<Node >::other::const_reference	const_nodeRef;
 
-		key_type&			GetKey(nodePtr X) const { return *(X->_data); }
-		const key_type&		GetKey(const Data& X) const { return (X); }
-		value_type&			GetValue(nodePtr X) const { return *(X->_data); }
-		const value_type&	GetValue(const Data& X) const { return (X); }
+		key_type&			GetKey(nodePtr X) const			{ return *(X->_data); }
+		const key_type&		GetKey(Data const& X) const		{ return (X); }
+		value_type&			GetValue(nodePtr X) const 		{ return *(X->_data); }
+		const value_type&	GetValue(Data const& X) const	{ return (X); }
 
 	};
 
@@ -78,12 +78,12 @@ namespace ft {
 		rebind<treeNode<Data> >::other				allocator_for_node;
 
 
-		typedef typename Alloc::size_type				sizeType;
-		typedef typename Alloc::difference_type			diffType;
-		typedef typename Alloc::pointer					ptr;
-		typedef typename Alloc::reference				ref;
-		typedef typename Alloc::const_pointer			const_ptr;
-		typedef typename Alloc::const_reference			const_ref;
+		typedef typename Alloc::size_type				size_type;
+		typedef typename Alloc::difference_type			difference_type;
+		typedef typename Alloc::pointer					pointer;
+		typedef typename Alloc::reference				reference;
+		typedef typename Alloc::const_pointer			const_pointer;
+		typedef typename Alloc::const_reference			const_reference;
 
 		typedef typename Alloc::template
 		rebind<Node >::other::pointer			nodePtr;
@@ -94,10 +94,10 @@ namespace ft {
 		typedef typename Alloc::template
 		rebind<Node >::other::const_reference	const_nodeRef;
 
-		key_type&	GetKey(nodePtr X) const { return X->_data->first; }
-		key_type&	GetKey(const Data& X) const { return X.first; }
-		key_type&	GetValue(nodePtr X) const { return X->_data->second; }
-		key_type&	GetValue(const Data& X) const { return X.second; }
+		key_type&			GetKey(nodePtr X) const 		{ return X->_data->first; }
+		const key_type&		GetKey(Data const& X) const 	{ return X.first; }
+		value_type&			GetValue(nodePtr X) const 		{ return X->_data->second; }
+		const value_type&	GetValue(Data const& X) const 	{ return X.second; }
 
 	};
 

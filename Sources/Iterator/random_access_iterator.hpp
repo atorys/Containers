@@ -90,7 +90,7 @@ namespace ft {
 	};
 
 	template < class RandIter > inline
-	random_access_iterator<RandIter>	operator+(typename iterator_traits<RandIter>::diffType N,
+	random_access_iterator<RandIter>	operator+(typename iterator_traits<RandIter>::difference_type N,
 													const random_access_iterator<RandIter>& x)
 	{
 		return (x + N);
