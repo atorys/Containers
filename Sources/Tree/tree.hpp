@@ -7,7 +7,7 @@
 #include <memory>
 #include "tree_node.hpp"
 #include "../Utils/pair.hpp"
-#include "../Iterator/tree_iterator.hpp"
+//#include "../Iterator/tree_iterator.hpp"
 #include "tree_traits.hpp"
 #include "../Utils/enable_if.hpp"
 #include "../Utils/is_integral.hpp"
@@ -18,6 +18,10 @@
 #define DEF		"\033[0m"
 
 namespace ft {
+
+
+	template <class Tree_traits, class BiDirIter >
+	class tree_iterator;
 
 	template < class RedBlackTreeTraits >
 	class RedBlackTree : public RedBlackTreeTraits {
@@ -44,8 +48,9 @@ namespace ft {
 		typedef typename RedBlackTreeTraits::allocator_for_node		allocNode;
 
 
-		typedef ft::tree_iterator < Data, Self, BiDirIter <node_type, difference_type, nodePtr, nodeRef> >				iterator;
-		typedef ft::tree_iterator < Data, Self, BiDirIter <node_type, difference_type, const_nodePtr, const_nodeRef> >	const_iterator;
+		typedef ft::tree_iterator < RedBlackTreeTraits, BiDirIter <node_type, difference_type, nodePtr, nodeRef> >		iterator;
+		friend class tree_iterator < RedBlackTreeTraits, BiDirIter <node_type, difference_type, nodePtr, nodeRef> >;
+//		typedef ft::tree_iterator < Data, Self, BiDirIter <node_type, difference_type, const_nodePtr, const_nodeRef> >	const_iterator;
 //		typedef ft::reverse_iterator < iterator >																		reverse_iterator;
 //		typedef ft::reverse_iterator < const_iterator >																	const_reverse_iterator;
 
@@ -81,10 +86,10 @@ namespace ft {
 		allocPair				get_allocator() const	{ return _allocator; }
 
 		//_4_Element_access_____________________________________________________________________________________________
-		iterator				begin()					{ return iterator(Min(this->_root), this); }
-		const_iterator			cbegin()	const		{ return const_iterator(Min(this->_root), this); }
-		iterator				end()					{ return iterator(this->_end, this); }
-		const_iterator			cend() const			{ return const_iterator(this->_end, this); }
+		iterator				begin()					{ return iterator(Min(this->_root)); }
+//		const_iterator			cbegin()	const		{ return const_iterator(Min(this->_root)); }
+		iterator				end()					{ return iterator(this->_end); }
+//		const_iterator			cend() const			{ return const_iterator(this->_end, this); }
 //		const_reverse_iterator	rend() const			{ return const_reverse_iterator(this->begin()); }
 //		reverse_iterator		rend()					{ return reverse_iterator(this->begin()); }
 //		const_reverse_iterator	rbegin() const			{ return const_reverse_iterator(this->end()); }
@@ -151,7 +156,7 @@ namespace ft {
 			_root = Insert(newNode, _root);
 			fixViolation(newNode);
 
-			return (ft::make_pair(iterator(newNode, this), true));
+			return (ft::make_pair(iterator(newNode), true));
 		}
 		template < class Iter >
 		void						insert(Iter first, Iter last,
@@ -177,8 +182,8 @@ namespace ft {
 		}
 
 		//_7_LookUp_____________________________________________________________________________________________________
-		iterator		find(key_type const& key)				{ return iterator(Find(key, this->_root), this); }
-		const_iterator	find(key_type const& key) const			{ return const_iterator(Find(key, this->_root), this); }
+		iterator		find(key_type const& key)				{ return iterator(Find(key, this->_root)); }
+//		const_iterator	find(key_type const& key) const			{ return const_iterator(Find(key, this->_root)); }
 		size_type		count(key_type const& key) const		{ return (size_type)(Find(key, this->_root) != nullptr); }
 		bool 			contains(key_type const& key) const		{ return Find(key, this->_root) != nullptr; }
 
@@ -191,64 +196,71 @@ namespace ft {
 			iterator	it = lower_bound(key);
 			return getKey(*it) == key && it != end() ? ++it : it;
 		}
-		const_iterator	lower_bound(key_type const& key) const {
-			const_iterator	it = cbegin();
-			for (; it != cend() && _key_compare(getKey(*it), key); ++it) {}
-			return it;
-		}
-		const_iterator	upper_bound(key_type const& key) const {
-			const_iterator	it = lower_bound(key);
-			return getKey(*it) == key && it != cend() ? ++it : it;
-		}
+//		const_iterator	lower_bound(key_type const& key) const {
+//			const_iterator	it = cbegin();
+//			for (; it != cend() && _key_compare(getKey(*it), key); ++it) {}
+//			return it;
+//		}
+//		const_iterator	upper_bound(key_type const& key) const {
+//			const_iterator	it = lower_bound(key);
+//			return getKey(*it) == key && it != cend() ? ++it : it;
+//		}
 
 //		ft::pair<iterator, iterator>				equal_range(key_type const& key) {
 //			return ft::make_pair<iterator, iterator>(lower_bound(key), upper_bound(key));
 //		}
-		ft::pair<const_iterator, const_iterator>	equal_range(key_type const& key) const {
-			const_iterator	itLow = lower_bound(key);
-			const_iterator	itUp = upper_bound(key);
-			return ft::make_pair<const_iterator, const_iterator>(itLow, itUp);
-		}
+//		ft::pair<const_iterator, const_iterator>	equal_range(key_type const& key) const {
+//			const_iterator	itLow = lower_bound(key);
+//			const_iterator	itUp = upper_bound(key);
+//			return ft::make_pair<const_iterator, const_iterator>(itLow, itUp);
+//		}
 
 		//_8_Observers__________________________________________________________________________________________________
 		key_compare		key_comp() const	{ return _key_compare; }
 //		value_compare	value_comp() const	{ return _value_compare; }
 		void swap(Self &X) {(void)X;}
 
-
-		typedef struct	help {
-			std::string	s;
-			help*		next;
-		} help;
-
 		void	print()
 		{
 			std::cout << "ROOT\n";
-			printNode(_end, _root, 0, 0, false);
+			printNode(_end, _root, 0, false);
 			std::cout << "\n";
 		}
 
-		void	printNode(nodePtr& parent, nodePtr& node, int depth, int rights, bool left)
+		bool	check_left(nodePtr parent, int depth, bool left) {
+			nodePtr granny = parent;
+			nodePtr tmp;
+			nodePtr tmp_prev;
+			while (granny && --depth) {
+				tmp = granny;
+				granny = granny->_parent;
+			}
+			return (granny && granny->_left == tmp && granny != parent);
+		}
+
+		void	printNode(nodePtr& parent, nodePtr& node, int depth, bool left)
 		{
+			std::string	prefix;
 			if (depth) {
 				for (int i = 0; i < depth - 1; i++) {
-					if (rights-- > 0)
-						std::cout << "    ";
+					if (check_left(parent, depth, left))
+						prefix += "    ";
 					else if (parent != this->_root)
-						std::cout << " │  ";
+						prefix += " │  ";
 				}
 				if (parent) {
 					if (!left)
-						std::cout << " ├──";
+						prefix += " ├──";
 					else
-						std::cout << " └──";
+						prefix += " └──";
 				}
 			}
+			std::cout << prefix;
 			PrintNode(node);
 			if (!node)
 				return ;
-			printNode(node, node->_right, depth + 1, rights, false);
-			printNode(node, node->_left, depth + 1, rights + 2,true);
+			printNode(node, node->_right, depth + 1, false);
+			printNode(node, node->_left, depth + 1, true);
 		}
 
 		bool	getColor(const nodePtr& node) const

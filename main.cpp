@@ -77,9 +77,15 @@ int main()
 //		tree2.insert(ft::make_pair(9, 56));
 //		tree2.insert(ft::make_pair(8, 94));
 
-//		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it;
+		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it;
 //		ft::pair<ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator, ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator> rt = tree2.equal_range(2);
-		tree2.print();
+//		tree2.print();
+		it = tree2.begin();
+		while (it != tree2.end())
+		{
+			std::cout << (*it).first << "\n";
+			++it;
+		}
 //		tree2.erase(8);
 //		tree2.print();
 
