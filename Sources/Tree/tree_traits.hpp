@@ -40,6 +40,8 @@ namespace ft {
 		typedef Alloc								self_type_allocator;
 		typedef typename Alloc::template
 		rebind<Node >::other						allocator_for_node;
+		typedef typename Alloc::template
+		rebind<treeNode<Data>* >::other				allocator_for_node_ptr;
 
 
 		typedef typename Alloc::size_type				size_type;
@@ -58,10 +60,10 @@ namespace ft {
 		typedef typename Alloc::template
 		rebind<Node >::other::const_reference	const_nodeRef;
 
-		key_type&			GetKey(nodePtr X) const			{ return *(X->_data); }
-		const key_type&		GetKey(Data const& X) const		{ return (X); }
-		value_type&			GetValue(nodePtr X) const 		{ return *(X->_data); }
-		const value_type&	GetValue(Data const& X) const	{ return (X); }
+		static key_type&			GetKey(nodePtr X)			{ return *(X->_data); }
+		static const key_type&		GetKey(Data const& X)		{ return (X); }
+		static value_type&			GetValue(nodePtr X) 		{ return *(X->_data); }
+		static const value_type&	GetValue(Data const& X)		{ return (X); }
 
 	};
 
@@ -76,12 +78,18 @@ namespace ft {
 		typedef Alloc								self_type_allocator;
 		typedef typename Alloc::template
 		rebind<treeNode<Data> >::other				allocator_for_node;
+		typedef typename Alloc::template
+		rebind<treeNode<Data>* >::other				allocator_for_node_ptr;
+
+
+		typedef Data*		pointer;
+		typedef Data&		reference;
 
 
 		typedef typename Alloc::size_type				size_type;
 		typedef typename Alloc::difference_type			difference_type;
-		typedef typename Alloc::pointer					pointer;
-		typedef typename Alloc::reference				reference;
+//		typedef typename Alloc::pointer					pointer;
+//		typedef typename Alloc::reference				reference;
 		typedef typename Alloc::const_pointer			const_pointer;
 		typedef typename Alloc::const_reference			const_reference;
 
@@ -94,10 +102,10 @@ namespace ft {
 		typedef typename Alloc::template
 		rebind<Node >::other::const_reference	const_nodeRef;
 
-		key_type&			GetKey(nodePtr X) const 		{ return X->_data->first; }
-		const key_type&		GetKey(Data const& X) const 	{ return X.first; }
-		value_type&			GetValue(nodePtr X) const 		{ return X->_data->second; }
-		const value_type&	GetValue(Data const& X) const 	{ return X.second; }
+		static key_type&			GetKey(nodePtr X)		{ return X->_data->first; }
+		static const key_type&		GetKey(Data const& X) 	{ return X.first; }
+		static value_type&			GetValue(nodePtr X) 	{ return X->_data->second; }
+		static const value_type&	GetValue(Data const& X) { return X.second; }
 
 	};
 

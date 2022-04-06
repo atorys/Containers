@@ -21,12 +21,12 @@ namespace ft {
 													typename iterator_traits<BiDirIter>::pointer,
 													typename iterator_traits<BiDirIter>::reference >
 	{
-		typedef	typename ft::iterator_traits<BiDirIter>::difference_type	thisDiff;
-		typedef	typename ft::iterator_traits<BiDirIter>::pointer 			thisPtr;
-		typedef	typename ft::iterator_traits<BiDirIter>::reference			thisRef;
-
-		typedef typename TreeTraits::pointer								dataPtr;
-		typedef typename TreeTraits::reference								dataRef;
+	public:
+//		typedef	typename ft::iterator_traits<BiDirIter>::pointer 			thisPtr;
+		typedef	typename ft::RedBlackTree<TreeTraits>::nodePtr 				thisPtr;
+		typedef typename ft::RedBlackTree<TreeTraits>						tree;
+		typedef typename TreeTraits::pointer								pointer;
+		typedef typename TreeTraits::reference								reference;
 		typedef tree_iterator< TreeTraits, BiDirIter>						Self;
 
 	protected:
@@ -34,17 +34,20 @@ namespace ft {
 
 	public:
 
-		tree_iterator(): _current(nullptr) {}
-		explicit	tree_iterator(thisPtr x) : _current(x) {}
-		tree_iterator(const Self& other) : _current(other.base()) {}
-		template < class Other >
-		tree_iterator(const tree_iterator < Other, BiDirIter > & other): _current(reinterpret_cast<thisPtr> (other.base())) {}
+		tree_iterator() :						_current(nullptr)		{}
+		tree_iterator(const Self& other) :		_current(other.base())	{}
+		explicit	tree_iterator(thisPtr x) :	_current(x)				{}
+
+		template < class Other, class OtherBiDir >
+		tree_iterator(const tree_iterator < Other, OtherBiDir > & other) {
+			_current = reinterpret_cast<thisPtr> (other.base());
+		}
 		virtual ~tree_iterator() {}
 
 		thisPtr		base() const			{ return _current; };
-		dataRef		operator*() const		{ return *(_current)->_data; }
-//		dataPtr		operator->() const		{ return _current->_data; } // (_current->_data)?
-		dataPtr		operator->() const		{ return &**this; } // (_current->_data)?
+		reference	operator*() const		{ return (*(_current->_data)); }
+		pointer		operator->() const		{ return (&**this);}
+
 		Self& 		operator=(const Self& other)
 		{
 			if (this != &other)
@@ -52,21 +55,22 @@ namespace ft {
 			return *this;
 		}
 
-		template < class Other >
-		Self& 	operator=(const tree_iterator<Other, BiDirIter>& other)
+		template < class Other, class OtherBiDir >
+		Self& 	operator=(const tree_iterator<Other, OtherBiDir>& other)
 		{
 			_current = reinterpret_cast<thisPtr> (other.base());
 			return *this;
 		};
+
 		Self&	operator++() // идем снизу вверх по дереву, от меньших элементов к большим
 		{
-			if (_current == ft::RedBlackTreeTraits<TreeTraits>::max())
-				_current = nullptr;
-			else if (_current->_right) { // если есть узел справа, спускаемся в его левое поддерево
+			if (!_current || tree::isEnd(_current))
+				;
+			else if (tree::isMax(_current))
 				_current = _current->_right;
-				while (_current->_left)
-					_current = _current->_left;
-			}
+			else if (_current->_right)// если есть узел справа, спускаемся в его левое поддерево
+//			else if (!tree::isEnd(_current->_right))// если есть узел справа, спускаемся в его левое поддерево
+				_current = tree::Min(_current->_right);
 			else { //если узла справа нет, поднимаемся до родителя и идем вверх, пока не окажемся в левом поддереве
 				thisPtr	parent = _current->_parent;
 				while (parent && _current == parent->_right) {
@@ -77,21 +81,31 @@ namespace ft {
 			}
 			return	*this;
 		}
+
 		Self	operator++(int)
 		{
 			Self tmp = *this;
 			++(*this);
 			return (tmp);
 		}
+
 		Self&	operator--() // идем сверху вниз по дереву, от больших элементов к меньшим
 		{
-			if (_current == nullptr)
-				_current = ft::RedBlackTreeTraits<TreeTraits>::max();
-			else if (_current->_left) { // если есть узел слева, спускаемся в его правое поддерево
-				_current = _current->_left;
-				while (_current->_right)
-					_current = _current->_right;
+			if (!_current)
+				;
+			else if (tree::isMin(_current) && _current->_parent) {
+				thisPtr	parent = _current->_parent;
+				while (parent && _current == parent->_left) {
+					_current = parent;
+					parent = parent->_parent;
+				}
+				_current = tree::Max(_current)->_right;
 			}
+			else if (_current->_parent && tree::isMax(_current->_parent))
+				_current = _current->_parent;
+//			else if (!tree::isEnd(_current->_left) && _current->_left) // если есть узел слева, спускаемся в его правое поддерево
+			else if (_current->_left) // если есть узел слева, спускаемся в его правое поддерево
+				_current = tree::Max(_current->_left);
 			else { //если узла слева нет, поднимаемся до родителя и идем вверх, пока не окажемся в правом поддереве
 				thisPtr	parent = _current->_parent;
 				while (parent && _current == parent->_left) {
@@ -102,73 +116,78 @@ namespace ft {
 			}
 			return	*this;
 		}
+
 		Self	operator--(int)
 		{
 			Self tmp = *this;
 			--(*this);
 			return tmp;
 		}
-		bool 		operator==(const tree_iterator<TreeTraits, BiDirIter>& other) const { return (_current == other.base()); }
-//		template <class TreeOther>
-//		bool 		operator==(const tree_iterator<TreeOther, BiDirIter>& other) const { return (_current == other.base()); }
+		bool 		operator==(const Self& other) const { return (_current == other.base()); }
+		template	<class TreeOther>
+		bool 		operator==(const tree_iterator<TreeOther, BiDirIter>& other) const { return (_current == other.base()); }
 		bool 		operator!=(const Self& other) const { return !(*this == other); }
 	};
 
-	template < class Type, class Tree, class BiDirIter >
+	/**********************************
+ 	* 	template class TREE_Iterator  *
+ 	**********************************/
+	template < class TreeTraits, class BiDirIter >
 	class	const_tree_iterator : public ft::iterator <	typename iterator_traits<BiDirIter>::iterator_category,
 														typename iterator_traits<BiDirIter>::value_type,
 														typename iterator_traits<BiDirIter>::difference_type,
 														typename iterator_traits<BiDirIter>::pointer,
 														typename iterator_traits<BiDirIter>::reference >
 	{
-		typedef	typename ft::iterator_traits<BiDirIter>::difference_type	thisDiff;
-		typedef	typename ft::iterator_traits<BiDirIter>::const_pointer 		thisPtr;
-		typedef	typename ft::iterator_traits<BiDirIter>::reference			thisRef;
-		typedef const_tree_iterator<Type, Tree, BiDirIter>						Self;
-	protected:
+	public:
+//		typedef	typename ft::iterator_traits<BiDirIter>::pointer 			thisPtr;
+		typedef	typename ft::RedBlackTree<TreeTraits>::nodePtr 				thisPtr;
+		typedef typename ft::RedBlackTree<TreeTraits>						tree;
+		typedef typename TreeTraits::pointer								pointer;
+		typedef typename TreeTraits::reference								reference;
+		typedef const_tree_iterator< TreeTraits, BiDirIter>					Self;
 
+	protected:
 		thisPtr		_current;
-		Tree*		_tree;
 
 	public:
 
-		const_tree_iterator(){}
-		explicit	const_tree_iterator(thisPtr x, Tree* tree) : _current(x), _tree(tree) {}
-		const_tree_iterator(const Self& other) : _current(other.base()), _tree(other._tree) {}
+		const_tree_iterator() :							_current(nullptr)		{}
+		const_tree_iterator(const Self& other) :		_current(other.base())	{}
+		explicit	const_tree_iterator(thisPtr x) :	_current(x)				{}
+
+		template < class Other >
+		const_tree_iterator(const Other& other) {
+			_current = reinterpret_cast<thisPtr> (other.base());
+		}
 		virtual ~const_tree_iterator() {}
 
 		thisPtr		base() const			{ return _current; };
-		Type 		operator*() const		{ return *(_current)->_data; }
-		Type*		operator->() const		{ return _current->_data; } // (_current->_data)?
-		Self& 	operator=(const Self& other)
-		{
-			if (this != &other) {
-				_current = other.base();
-				_tree = other._tree;
-			}
-			return *this;
-		};
-		template < class TypeOther, class TreeOther >
-		const_tree_iterator& 	operator=(const const_tree_iterator<TypeOther, TreeOther, BiDirIter>& other)
-		{
-//			tree_iterator<TypeOther, TreeOther, BiDirIter> tmp;
+		reference	operator*() const		{ return (*(_current->_data)); }
+		pointer		operator->() const		{ return (&**this);}
 
-//			tmp._current = (Type *)
-			if (this != &other) {
+		Self& 		operator=(const Self& other)
+		{
+			if (this != &other)
 				_current = other.base();
-				_tree = other._tree;
-			}
 			return *this;
-		};
+		}
+
+		template < class Other>
+		Self& 		operator=(const Other& other)
+		{
+			_current = reinterpret_cast<thisPtr> (other.base());
+			return *this;
+		}
+
 		Self&	operator++() // идем снизу вверх по дереву, от меньших элементов к большим
 		{
-			if (_current == _tree->max())
-				_current = nullptr;
-			else if (_current->_right) { // если есть узел справа, спускаемся в его левое поддерево
+			if (!_current || tree::isEnd(_current))
+				;
+			else if (tree::isMax(_current))
 				_current = _current->_right;
-				while (_current->_left)
-					_current = _current->_left;
-			}
+			else if (!tree::isEnd(_current->_right))// если есть узел справа, спускаемся в его левое поддерево
+				_current = tree::Min(_current->_right);
 			else { //если узла справа нет, поднимаемся до родителя и идем вверх, пока не окажемся в левом поддереве
 				thisPtr	parent = _current->_parent;
 				while (parent && _current == parent->_right) {
@@ -179,21 +198,30 @@ namespace ft {
 			}
 			return	*this;
 		}
+
 		Self	operator++(int)
 		{
 			Self tmp = *this;
 			++(*this);
 			return (tmp);
 		}
+
 		Self&	operator--() // идем сверху вниз по дереву, от больших элементов к меньшим
 		{
-			if (_current == nullptr)
-				_current = _tree->max();
-			else if (_current->_left) { // если есть узел слева, спускаемся в его правое поддерево
-				_current = _current->_left;
-				while (_current->_right)
-					_current = _current->_right;
+			if (!_current)
+				;
+			else if (tree::isMin(_current) && _current->_parent) {
+				thisPtr	parent = _current->_parent;
+				while (parent && _current == parent->_left) {
+					_current = parent;
+					parent = parent->_parent;
+				}
+				_current = tree::Max(_current)->_right;
 			}
+			else if (_current->_parent && tree::isMax(_current->_parent))
+				_current = _current->_parent;
+			else if (!tree::isEnd(_current->_left) && _current->_left) // если есть узел слева, спускаемся в его правое поддерево
+				_current = tree::Max(_current->_left);
 			else { //если узла слева нет, поднимаемся до родителя и идем вверх, пока не окажемся в правом поддереве
 				thisPtr	parent = _current->_parent;
 				while (parent && _current == parent->_left) {
@@ -204,15 +232,16 @@ namespace ft {
 			}
 			return	*this;
 		}
+
 		Self	operator--(int)
 		{
 			Self tmp = *this;
 			--(*this);
 			return tmp;
 		}
-		bool 		operator==(const const_tree_iterator<Type, Tree, BiDirIter>& other) const { return (_current == other.base()); }
-		template <class TreeOther>
-		bool 		operator==(const const_tree_iterator<Type, TreeOther, BiDirIter>& other) const { return (_current == other.base()); }
+		bool 		operator==(const Self& other) const { return (_current == other.base()); }
+		template	<class TreeOther>
+		bool 		operator==(const const_tree_iterator<TreeOther, BiDirIter>& other) const { return (_current == other.base()); }
 		bool 		operator!=(const Self& other) const { return !(*this == other); }
 	};
 

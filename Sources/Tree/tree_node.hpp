@@ -34,7 +34,7 @@ namespace ft {
 //			return *this;
 //		}
 
-		Type&	operator*() { return *_data; }
+//		Type*	operator*() { return &**this; }
 		treeNode(): _data(nullptr),
 					_parent(nullptr),
 					_left(nullptr),

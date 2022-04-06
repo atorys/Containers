@@ -64,8 +64,7 @@ namespace ft {
 		map(Iter first, Iter last, const Compare& comp = Compare(), const Alloc& allocator = Alloc(),
 			typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr): Container(comp, allocator)
 		{
-			for (; first != last; first++)
-				this->insert(*first);
+			this->insert(first, last);
 		}
 
 		~map() { Container::clear(); }

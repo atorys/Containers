@@ -59,14 +59,14 @@ int main()
 	{
 
 		ft::RedBlackTree< ft::RedBlackTreeTraits<int, std::greater<int> > >	tree;
-		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::less<int> > >	tree2;
-
+		ft::map<const int, int> tree2;
 
 		tree2.insert(ft::make_pair(12, 234));
 		tree2.insert(ft::make_pair(85, 56));
 		tree2.insert(ft::make_pair(107, 56));
 		tree2.insert(ft::make_pair(8, 56));
 		tree2.insert(ft::make_pair(15, 56));
+		tree2.insert(ft::make_pair(15, 78));
 		tree2.insert(ft::make_pair(78, 56));
 //		tree2.insert(ft::make_pair(4, 56));
 		tree2.insert(ft::make_pair(9, 56));
@@ -74,18 +74,60 @@ int main()
 		tree2.insert(ft::make_pair(100, 56));
 		tree2.insert(ft::make_pair(101, 56));
 		tree2.insert(ft::make_pair(758, 56));
-//		tree2.insert(ft::make_pair(9, 56));
-//		tree2.insert(ft::make_pair(8, 94));
+		tree2.insert(ft::make_pair(9, 56));
+		tree2.insert(ft::make_pair(8, 94));
+//		std::vector<int> v;
+//
+//		for (int i = 0, j = 10; i < 30 * 2; ++i, ++j) {
+//			tree2.insert(ft::make_pair(i, j));
+//		}
+//		ft::map<int, int> mp2(tree2.begin(), tree2.end());
+//		ft::map<int, int>::iterator it = mp2.begin();
+//		for (int i = 0; i < 30 * 2; ++i, it++) {
+//			v.push_back(it->first);
+//			v.push_back(it->second);
+//		}
+//		return v;
 
-		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it;
-//		ft::pair<ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator, ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator> rt = tree2.equal_range(2);
-//		tree2.print();
+		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::less<int> > >::iterator it;
+//		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it2;
+////		ft::pair<ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator, ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator> rt = tree2.equal_range(2);
+		tree2.print();
 		it = tree2.begin();
-		while (it != tree2.end())
-		{
-			std::cout << (*it).first << "\n";
-			++it;
+//		it2 = tree.begin();
+		for (; it != tree2.end(); ++it) {
+			std::cout << it->first << "\n";
 		}
+
+		--it;
+		for (; it != tree2.end(); --it) {
+			std::cout << it->first << "\n";
+		}
+//
+
+//		std::vector<int> v;
+//
+//		for (int i = 0, j = 10; i < 30 * 2; ++i, ++j) {
+//			tree2.insert(ft::make_pair(i, j));
+//		}
+
+//		mp.insert(ft::make_pair(45, 3));
+//		mp.insert(ft::make_pair(1, 3));
+//		mp.insert(ft::make_pair(8, 3));
+//		mp.insert(ft::make_pair(5, 3));
+
+//		std::vector<int> v;
+//		for (int i = 0, j = 10; i < 20 * 2; ++i, ++j)
+//			mp.insert(ft::make_pair(i, j));
+//		ft::map<const int, int> mp2;
+//		for (int i = 20 * 2, j = 200010; i < 40 * 2; ++i, ++j)
+//			mp2.insert(ft::make_pair(i, j));
+//		mp2 = mp;
+//		ft::map<const int, int>::iterator it = mp2.begin();
+//		for (; it != mp2.end(); it++) {
+//			std::cout << it->first;
+//		}
+
 //		tree2.erase(8);
 //		tree2.print();
 
@@ -158,9 +200,12 @@ int main()
 //		it = map2.begin();
 //		for (; it != map2.end(); ++it)
 //			std::cout << (*it).first << "\n";
+
+//		std::vector<int> v;
+//		return v;
 	}
 
-//	while (1)
-//	{}
+	while (1)
+	{}
 	return 0;
 }

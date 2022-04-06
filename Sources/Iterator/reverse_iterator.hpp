@@ -22,27 +22,21 @@ namespace ft {
 		RandIter	_current;
 
 	public:
-		typedef	typename ft::iterator_traits<RandIter>::difference_type	thisDiff;
-		typedef	typename ft::iterator_traits<RandIter>::pointer 		thisPtr;
-		typedef	typename ft::iterator_traits<RandIter>::reference		thisRef;
-		typedef reverse_iterator<RandIter>								Self;
+		typedef	typename RandIter::difference_type	thisDiff;
+		typedef	typename RandIter::reference		thisRef;
+		typedef	typename RandIter::pointer			thisPtr;
+		typedef reverse_iterator<RandIter>			Self;
 
 		reverse_iterator(){};
 		explicit	reverse_iterator(RandIter x) : _current(x) {};
 		reverse_iterator(const reverse_iterator<RandIter>& other) : _current(other.base()) {};
 		virtual ~reverse_iterator() {};
 
-		RandIter	base() const { return _current; };
+		RandIter	base() const			{ return _current; };
+		thisRef		operator*() const		{ RandIter tmp = _current; return (*(--tmp)); };
+		thisPtr		operator->() const		{ return &**this; };
 
-		thisRef		operator*() const
-		{
-			RandIter tmp = _current;
-			return (*(--tmp));
-		};
-
-		thisPtr		operator->() const { return &**this; };
-
-		Self&	operator++() // инкремент декрементирует тк у нас реверсивный указатель
+		Self&		operator++() // инкремент декрементирует тк у нас реверсивный указатель
 		{
 			--_current;
 			return *this;
@@ -50,7 +44,7 @@ namespace ft {
 
 		Self	operator++(int)
 		{
-			Self tmp = this;
+			Self tmp = *this;
 			--_current;
 			return tmp;
 		};
