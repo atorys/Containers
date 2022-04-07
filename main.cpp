@@ -2,14 +2,8 @@
 // Created by atory on 3/12/22.
 //
 
-#include <iostream>
-#include <vector>
-#include <map>
-#include "cstdio"
-#include "Sources/vector.hpp"
-#include "Sources/stack.hpp"
-#include "Sources/Tree/tree.hpp"
-#include "Sources/map.hpp"
+#include "Tests/test_map.cpp"
+#include "Sources/set.hpp"
 
 int main()
 {
@@ -56,26 +50,26 @@ int main()
 //	std::cout << vector.size() << std::endl;
 //	std::cout << vector.capacity();
 
-	{
-
-		ft::RedBlackTree< ft::RedBlackTreeTraits<int, std::greater<int> > >	tree;
-		ft::map<const int, int> tree2;
-
-		tree2.insert(ft::make_pair(12, 234));
-		tree2.insert(ft::make_pair(85, 56));
-		tree2.insert(ft::make_pair(107, 56));
-		tree2.insert(ft::make_pair(8, 56));
-		tree2.insert(ft::make_pair(15, 56));
-		tree2.insert(ft::make_pair(15, 78));
-		tree2.insert(ft::make_pair(78, 56));
-//		tree2.insert(ft::make_pair(4, 56));
-		tree2.insert(ft::make_pair(9, 56));
-		tree2.insert(ft::make_pair(99, 56));
-		tree2.insert(ft::make_pair(100, 56));
-		tree2.insert(ft::make_pair(101, 56));
-		tree2.insert(ft::make_pair(758, 56));
-		tree2.insert(ft::make_pair(9, 56));
-		tree2.insert(ft::make_pair(8, 94));
+//	{
+//
+//		ft::RedBlackTree< ft::RedBlackTreeTraits<int, std::greater<int> > >	tree;
+//		ft::map<const int, int> tree2;
+//
+//		tree2.insert(ft::make_pair(12, 234));
+//		tree2.insert(ft::make_pair(85, 56));
+//		tree2.insert(ft::make_pair(107, 56));
+//		tree2.insert(ft::make_pair(8, 56));
+//		tree2.insert(ft::make_pair(15, 56));
+//		tree2.insert(ft::make_pair(15, 78));
+//		tree2.insert(ft::make_pair(78, 56));
+////		tree2.insert(ft::make_pair(4, 56));
+//		tree2.insert(ft::make_pair(9, 56));
+//		tree2.insert(ft::make_pair(99, 56));
+//		tree2.insert(ft::make_pair(100, 56));
+//		tree2.insert(ft::make_pair(101, 56));
+//		tree2.insert(ft::make_pair(758, 56));
+//		tree2.insert(ft::make_pair(9, 56));
+//		tree2.insert(ft::make_pair(8, 94));
 //		std::vector<int> v;
 //
 //		for (int i = 0, j = 10; i < 30 * 2; ++i, ++j) {
@@ -89,20 +83,20 @@ int main()
 //		}
 //		return v;
 
-		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::less<int> > >::iterator it;
-//		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it2;
-////		ft::pair<ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator, ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator> rt = tree2.equal_range(2);
-		tree2.print();
-		it = tree2.begin();
-//		it2 = tree.begin();
-		for (; it != tree2.end(); ++it) {
-			std::cout << it->first << "\n";
-		}
-
-		--it;
-		for (; it != tree2.end(); --it) {
-			std::cout << it->first << "\n";
-		}
+//		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::less<int> > >::iterator it;
+////		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it2;
+//////		ft::pair<ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator, ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator> rt = tree2.equal_range(2);
+//		tree2.print();
+//		it = tree2.begin();
+////		it2 = tree.begin();
+//		for (; it != tree2.end(); ++it) {
+//			std::cout << it->first << "\n";
+//		}
+//
+//		--it;
+//		for (; it != tree2.end(); --it) {
+//			std::cout << it->first << "\n";
+//		}
 //
 
 //		std::vector<int> v;
@@ -203,9 +197,38 @@ int main()
 
 //		std::vector<int> v;
 //		return v;
+//		test_map();
+//	}
+//	{
+//		ft::set	<int>	set;
+//		int input;
+//		while (1)
+//		{
+//			system("clear");
+//			set.print();
+//			std::cin >> input;
+//			if (input == -1)
+//				break ;
+//			set.insert(input);
+//		}
+//	}
+	{
+		ft::set<int> set;
+
+		set.insert(10);
+		set.insert(9);
+		set.insert(12);
+//		set.insert(11);
+//		set.insert(89);
+//		set.insert(78);
+//		set.insert(54);
+		set.print();
+		set.erase(10);
+//		set.erase(11);
+		set.print();
 	}
 
-	while (1)
-	{}
+//	while (1)
+//	{}
 	return 0;
 }

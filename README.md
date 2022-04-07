@@ -1,4 +1,3 @@
-
 # Containers
 Implementation of container types of the C++ standard template library.  
 [➜ cppreference page](https://en.cppreference.com/w/cpp/container)
@@ -12,8 +11,11 @@ Implementation of container types of the C++ standard template library.
 - **map / set**  
     `based on dynamic structure - tree` `pair structure`  
     `tree iterator system` `red black tree`
+<div>
+<img src="tree_insertion.gif" width=20% height=20%/>
+</div>
 
-  
 ### Useful links
   - [RedBlack Tree insertion](https://www.geeksforgeeks.org/c-program-red-black-tree-insertion/)
   - [RedBlack Tree deletion](https://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/)
+  

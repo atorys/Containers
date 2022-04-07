@@ -7,10 +7,12 @@ INCLUDES	=	-I ./Sources/
 VPATH		=	./Sources/			\
 				./Sources/Iterator	\
 				./Sources/Tree		\
-				./Sources/Utils
+				./Sources/Utils		\
+				./Tests/
 
 #------------------------------------------FILES
 SRCS_NAME	=	main.cpp
+#				test_map.cpp
 OBJS_NAME	=	$(SRCS_NAME:.cpp=.o)
 
 #------------------------------------------RULES
@@ -21,6 +23,7 @@ all:		$(NAME)
 
 $(NAME):	$(OBJS_NAME)
 			c++ $(FLAGS) $(OBJS_NAME) -o $@
+			@rm -rf $(OBJS_NAME)
 
 $(OBJS_NAME): $(SRCS_NAME)
 			@c++ $(FLAGS) $(INCLUDES) -c $< -o $@

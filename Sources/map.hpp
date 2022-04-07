@@ -20,16 +20,13 @@ namespace ft {
 		typedef	ft::RedBlackTree< RedBlackTreeTraits < ft::pair< const Key, Type>, Compare, Alloc > >	Container;
 		typedef map <Key, Type, Compare, Alloc>															Self;
 
-//	private:
-//		Container	_c;
-
 	public:
 
 		//_1_Member_types_______________________________________________________________________________________________
 
 		typedef ft::pair< const Key, Type>				value_type;
-		typedef typename Alloc::template
-		rebind<value_type>::other						allocType;
+//		typedef typename Alloc::template
+//		rebind<value_type>::other						allocType;
 		typedef Key										keyType;
 		typedef Type									type;
 		typedef Alloc									allocator;
@@ -45,17 +42,7 @@ namespace ft {
 		typedef typename Container::const_iterator		const_iterator;
 
 		//_2_Constructors_______________________________________________________________________________________________
-//		explicit	map(const Compare& comp = Compare(), const Alloc& allocator = Alloc()): _c(comp, allocator) {}
-//		explicit	map(const Compare& comp): _c(comp, Alloc()) {}
-//		template < class Iter >
-//		map(Iter first, Iter last, const Compare& comp = Compare(), const Alloc& allocator = Alloc(),
-//			typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr): _c(comp, allocator)
-//		{
-//			for (; first != last; first++)
-//				_c.insert(*first);
-//		}
-//		map(const Self& other): _c(other._c) {}
-//		~map() { clear(); }
+
 		explicit	map(const Compare& comp = Compare(), const Alloc& allocator = Alloc()): Container(comp, allocator) {}
 		explicit	map(const Compare& comp): Container(comp, Alloc()) {}
 					map(const Self& other): Container(other) {}
@@ -68,50 +55,6 @@ namespace ft {
 		}
 
 		~map() { Container::clear(); }
-
-
-		//_3_Capacity___________________________________________________________________________________________________
-//		size_type				size()	const			{ return _c.size(); }
-//		size_type				max_size()	const		{ return _c.max_size(); }
-//		bool 					empty() const			{ return _c.empty(); }
-//		Alloc					get_allocator() const	{ return _c.get_allocator(); }
-//
-//		//_4_Element_access_____________________________________________________________________________________________
-//		iterator				begin()					{ return _c.begin(); }
-//		const_iterator			begin()	const			{ return _c.begin(); }
-//		iterator				end()					{ return _c.end(); }
-//		const_iterator			end() const				{ return _c.end(); }
-//		const_reverse_iterator	rend() const			{ return _c.rend(); }
-//		reverse_iterator		rend()					{ return _c.rend(); }
-//		const_reverse_iterator	rbegin() const			{ return _c.rbegin(); }
-//		reverse_iterator		rbegin()				{ return _c.rbegin(); }
-
-
-
-//		//_5_Member_functions___________________________________________________________________________________________
-//		//__Assignment_operator_____________________
-//		Self&	operator=(const Self& other)
-//		{
-//			this->_c = other._c;
-//			return *this;
-//		};
-//
-//		//_6_Modifiers__________________________________________________________________________________________________
-//		void							clear()	{ _c.clear(); }
-//
-//		ft::pair<iterator, bool>		insert(const value_type& X)	{ return (_c.insert(X)); }
-//		void							insert(const value_type& X, iterator position) { _c.insert(X); }
-//
-//		template < class Iter >
-//		void	insert(Iter first, Iter last,
-//					   typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr)
-//		{
-//			if (first == last)
-//				return ;
-//			for (; first != last; ++first)
-//				_c.insert(*first);
-//		}
-
 
 	};
 }

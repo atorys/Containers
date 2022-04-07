@@ -110,12 +110,6 @@ namespace ft {
 		nodePtr 				min() 					{ return Min(this->_root); }
 		nodePtr 				max() 					{ return Max(this->_root); }
 
-		static key_type&				getKey(nodePtr position)			{ return RedBlackTreeTraits::GetKey(position); }
-		static key_type&				getKey(iterator position)			{ return RedBlackTreeTraits::GetKey(*(position.base()->_data)); }
-		static key_type const&			getKey(Data const& position_data)	{ return RedBlackTreeTraits::GetKey(position_data); }
-		static value_type&				getValue(nodePtr position)			{ return RedBlackTreeTraits::GetValue(position); }
-		static value_type const&		getValue(Data const& position_data)	{ return RedBlackTreeTraits::GetValue(position_data); }
-
 		value_type&				at(const key_type& key) throw(std::out_of_range) // same as tree[N]
 		{
 			if (find(key) == this->end())
@@ -186,13 +180,32 @@ namespace ft {
 		}
 
 		//__Erase___________________________________________
-		void 		erase(iterator position) { _root = Remove(this->_root, position); }
+		void 		erase(iterator position)
+		{
+			if (position == this->end())
+				return ;
+			Remove(this->_root, position.base());
+			nodePtr maxNode = Max(this->_root);
+			_end ? (_end->_parent = maxNode) : _end = ConstructEnd(maxNode);
+			if (maxNode == _root && !isEnd(_root))
+				maxNode->_right = _end;
+			else if (isEnd(_root))
+				_root->_parent = nullptr;
+		}
 		size_type	erase(const key_type& key)
 		{
-
 			size_type	size = this->size();
-			_root = Remove(this->_root, Find(key, this->_root));
-			_end->_parent = Max(this->_root);
+			nodePtr	node = Find(key, this->_root);
+			if (node == this->end().base())
+				return size;
+			Remove(this->_root, node);
+
+			nodePtr maxNode = Max(this->_root);
+			_end ? (_end->_parent = maxNode) : _end = ConstructEnd(maxNode);
+			if (maxNode == _root && !isEnd(_root))
+				maxNode->_right = _end;
+			else if (isEnd(_root))
+				_root->_parent = nullptr;
 			return (size == this->size());
 		}
 		void		erase(iterator first, iterator last)
@@ -204,7 +217,7 @@ namespace ft {
 		//_7_LookUp_____________________________________________________________________________________________________
 		iterator		find(key_type const& key)				{ return iterator(Find(key, this->_root)); }
 		const_iterator	find(key_type const& key) const			{ return const_iterator(Find(key, this->_root)); }
-		size_type		count(key_type const& key) const		{ return (size_type)(Find(key, this->_root) != nullptr); }
+		size_type		count(key_type const& key) const		{ return (size_type)(find(key) != this->end()); }
 		bool 			contains(key_type const& key) const		{ return Find(key, this->_root) != nullptr; }
 
 		iterator		lower_bound(key_type const& key) {
@@ -214,7 +227,7 @@ namespace ft {
 		}
 		iterator		upper_bound(key_type const& key) {
 			iterator	it = lower_bound(key);
-			return it != end() && getKey(it) == key ? ++it : it;
+			return it != end() && this->getKey(it) == key ? ++it : it;
 		}
 		const_iterator	lower_bound(key_type const& key) const {
 			const_iterator	it = begin();
@@ -304,7 +317,7 @@ namespace ft {
 		}
 
 		static nodePtr		Max(const nodePtr& position) {
-			return  !isEnd(position)&& position != nullptr && !isEnd(position->_right) && position->_right ? Max(position->_right) : position;
+			return  !isEnd(position) && position != nullptr && !isEnd(position->_right) && position->_right ? Max(position->_right) : position;
 		}
 
 		static bool		isMax(const nodePtr& position) {
@@ -423,11 +436,12 @@ namespace ft {
 			setColor(this->_root, Black);
 		}
 
-		void fixRemove(nodePtr& position, nodePtr node, nodePtr parent) {
+		void fixRemove(nodePtr& root, nodePtr node, nodePtr parent) {
 
+			if (node == nullptr || isEnd(node))
+				return;
 			nodePtr	otherNode;
-			printf("111\n");
-			while ((!node) || (node->_color == Black && node != position)) {
+			while ((!node && !isEnd(node)) || (node->_color == Black && node != root)) {
 				if (parent && parent->_left == node) {
 
 					otherNode = parent->_right;
@@ -450,11 +464,11 @@ namespace ft {
 						parent->_color = Black;
 						otherNode->_right->_color = Black;
 						rotateLeft(parent);
-						node = position;
+						node = root;
 						break ;
 					}
 				}
-				else {
+				else if (parent) {
 					otherNode = parent->_left;
 					if (otherNode->_color == Red) {
 						otherNode->_color = Black;
@@ -480,13 +494,14 @@ namespace ft {
 						parent->_color = Black;
 						otherNode->_left->_color = Black;
 						rotateRight(parent);
-						node = position;
+						node = root;
 						break;
 					}
 				}
 			}
 			if (node)
 				node->_color = Black;
+//			this->_root = root;
 		}
 
 
@@ -530,6 +545,7 @@ namespace ft {
 			Clear(position->_left);
 			Clear(position->_right);
 			Destroy(position);
+			position = nullptr;
 		}
 
 		void	Destroy(nodePtr position)
@@ -543,7 +559,6 @@ namespace ft {
 			}
 			_allocator_node.destroy(position);
 			_allocator_node.deallocate(position, 1);
-			position = nullptr;
 		}
 
 		void	Copy(nodePtr& newNode, const nodePtr& otherNode)
@@ -573,7 +588,7 @@ namespace ft {
 			return position;
 		}
 
-		nodePtr	Remove(nodePtr node, nodePtr position) {
+		void	Remove(nodePtr root, nodePtr node) {
 
 			nodePtr	child, parent, replace;
 			bool	color;
@@ -586,7 +601,7 @@ namespace ft {
 					replace = replace->_left;
 
 				if (node->_parent == nullptr) // если удаляем корень
-					position = replace;
+					root = replace;
 				else { // если не корень
 					if (node->_parent->_left == node) // перекидываем указатель у родителя на замену
 						node->_parent->_left = replace;
@@ -612,9 +627,9 @@ namespace ft {
 				replace->_left = node->_left;
 				node->_left->_parent = replace;
 				if (color == Black)
-					fixRemove(position, child, parent);
+					fixRemove(root, child, parent);
 				Destroy(node);
-				return position;
+				return ;
 			}
 			if (node->_left)
 				child = node->_left;
@@ -633,12 +648,12 @@ namespace ft {
 					parent->_right = child;
 			}
 			else
-				position = child;
+				this->_root = child;
 
 			if (color == Black)
-				fixRemove(position, child, parent);
+				fixRemove(root, child, parent);
 			Destroy(node);
-			return position;
+			this->_root = root;
 		}
 
 		nodePtr		Find(const key_type& key, const nodePtr& position) const {
@@ -652,6 +667,12 @@ namespace ft {
 		size_type	Size(const nodePtr& position) const {
 			return !isEnd(position) && position ? Size(position->_right) + Size(position->_left) + 1 : 0 ;
 		}
+
+		static key_type&				getKey(nodePtr position)			{ return RedBlackTreeTraits::GetKey(position); }
+		static key_type const&			getKey(iterator position)			{ return RedBlackTreeTraits::GetKey(*(position.base()->_data)); }
+		static key_type const&			getKey(Data const& position_data)	{ return RedBlackTreeTraits::GetKey(position_data); }
+		static value_type&				getValue(nodePtr position)			{ return RedBlackTreeTraits::GetValue(position); }
+		static value_type const&		getValue(Data const& position_data)	{ return RedBlackTreeTraits::GetValue(position_data); }
 
 	};
 
