@@ -11,8 +11,11 @@ Implementation of container types of the C++ standard template library.
 - **map / set**  
     `based on dynamic structure - tree` `pair structure`  
     `tree iterator system` `red black tree`
+
+#### Tree visualization :  
+
 <div>
-<img src="tree_insertion.gif" width=20% height=20%/>
+<img src="tree_insertion.gif" width=30% height=20%/>
 </div>
 
 ### Useful links

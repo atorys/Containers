@@ -32,6 +32,8 @@ namespace ft {
 		random_access_iterator(){};
 		explicit random_access_iterator(thisPtr x) : _current(x) {}
 		random_access_iterator(const Self& other) : _current(other.base()) {}
+		template < class Other >
+		random_access_iterator(const random_access_iterator<Other> &X): _current(X.base()) {}
 		virtual ~random_access_iterator(){}
 
 		thisPtr		base() const { return _current; }
@@ -82,7 +84,7 @@ namespace ft {
 		bool 		operator==(int other) const { return (_current == (thisPtr)other); }
 		bool 		operator!=(const Self& other) const { return !(*this == other); }
 		bool 		operator>(const Self& other) const { return (other < *this); }
-		bool 		operator<(const Self& other) const { return (_current < other.base()); } // todo : 119 почему сравниваются ссылки
+		bool 		operator<(const Self& other) const { return (_current < other.base()); }
 		bool 		operator>=(const Self& other) const { return !(*this < other); }
 		bool 		operator<=(const Self& other) const { return !(other < *this); }
 		thisRef 	operator[](thisDiff N) { return *(*this + N); };

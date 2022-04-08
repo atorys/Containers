@@ -29,12 +29,19 @@ namespace ft {
 
 		reverse_iterator(){};
 		explicit	reverse_iterator(RandIter x) : _current(x) {};
-		reverse_iterator(const reverse_iterator<RandIter>& other) : _current(other.base()) {};
+		template 	< class Other >
+		reverse_iterator(const reverse_iterator<Other>& other) : _current(other.base()) {};
 		virtual ~reverse_iterator() {};
 
 		RandIter	base() const			{ return _current; };
 		thisRef		operator*() const		{ RandIter tmp = _current; return (*(--tmp)); };
 		thisPtr		operator->() const		{ return &**this; };
+		Self& 		operator=(const Self& other)
+		{
+			if (this != &other)
+				_current = other.base();
+			return *this;
+		}
 
 		Self&		operator++() // инкремент декрементирует тк у нас реверсивный указатель
 		{
@@ -83,22 +90,46 @@ namespace ft {
 		thisRef 	operator[](thisDiff N) const { return *(*this + N);	};
 	};
 
-	template < class RandIter > inline
-	bool	operator==(const reverse_iterator<RandIter>& A, const reverse_iterator<RandIter>& B)
+	template < class RandIter1, class RandIter2 > inline
+	bool	operator==(const reverse_iterator<RandIter1>& A, const reverse_iterator<RandIter2>& B)
 	{
 		return A.Eq(B);
 	}
 
-	template < class RandIter > inline
-	bool	operator!=(const reverse_iterator<RandIter>& A, const reverse_iterator<RandIter>& B)
+	template < class RandIter1, class RandIter2 > inline
+	bool	operator!=(const reverse_iterator<RandIter1>& A, const reverse_iterator<RandIter2>& B)
 	{
 		return !(A.Eq(B));
 	}
 
-	template < class RandIter > inline
-	reverse_iterator<RandIter>	operator+(typename iterator_traits<RandIter>::difference_type N,
-												  const reverse_iterator<RandIter>& x)
+	template < class RandIter1, class RandIter2 > inline
+	reverse_iterator<RandIter1>	operator+(typename iterator_traits<RandIter1>::difference_type N,
+												  const reverse_iterator<RandIter1>& x)
 	{
 		return (x - N);
+	}
+
+	template < class RandIter1, class RandIter2 > inline
+	bool operator<(const reverse_iterator<RandIter1> &A, const reverse_iterator<RandIter2> &B)
+	{
+		return (B.base() < A.base());
+	}
+
+	template < class RandIter1, class RandIter2 > inline
+	bool operator>(const reverse_iterator<RandIter1> &A, const reverse_iterator<RandIter2> &B)
+	{
+		return (B < A);
+	}
+
+	template < class RandIter1, class RandIter2 > inline
+	bool operator<=(const reverse_iterator<RandIter1> &A, const reverse_iterator<RandIter2> &B)
+	{
+		return (!(B < A));
+	}
+
+	template < class RandIter1, class RandIter2 > inline
+	bool operator>=(const reverse_iterator<RandIter1> &A, const reverse_iterator<RandIter2> &B)
+	{
+		return (!(A < B));
 	}
 }

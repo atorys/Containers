@@ -63,10 +63,8 @@ namespace ft {
 
 
 		//_2_Constructors_______________________________________________________________________________________________
-		RedBlackTree():	_allocator(allocPair()),
-									_allocator_node(allocNode()),
-									_key_compare(key_compare()),
-									_root(nullptr), _end(nullptr) {}
+		RedBlackTree():	_allocator(allocPair()), _allocator_node(allocNode()), _key_compare(key_compare()),
+																						_root(nullptr), _end(nullptr) {}
 		explicit	RedBlackTree(const key_compare& comp, const allocPair& A = allocPair()):
 																						_allocator(A),
 																						_allocator_node(allocNode()),
@@ -74,7 +72,7 @@ namespace ft {
 																						_root(nullptr), _end(nullptr) {}
 		RedBlackTree(Self const& other):	_allocator(allocPair()),
 											_allocator_node(allocNode()),
-											_key_compare(key_compare()),
+											_key_compare(other._key_compare),
 											_root(nullptr), _end(nullptr)
 		{
 			if (this->_root != nullptr || other.size() == 0)
@@ -94,6 +92,7 @@ namespace ft {
 		//_3_Capacity___________________________________________________________________________________________________
 		size_type				size()	const			{ return Size(_root); }
 //		size_type				max_size()	const		{ return _allocator_node.max_size(); } // todo : ???????
+//		size_type				max_size()	const		{ return std::numeric_limits<size_type>::max(); } // todo : ???????
 		size_type				max_size()	const		{ return _allocator.max_size() / 2; } // todo : ???????
 		bool 					empty() const			{ return (size() == 0); }
 		allocPair				get_allocator() const	{ return _allocator; }
@@ -107,8 +106,6 @@ namespace ft {
 		reverse_iterator		rend()					{ return reverse_iterator(this->begin()); }
 		const_reverse_iterator	rbegin() const			{ return const_reverse_iterator(this->end()); }
 		reverse_iterator		rbegin()				{ return reverse_iterator(this->end()); }
-		nodePtr 				min() 					{ return Min(this->_root); }
-		nodePtr 				max() 					{ return Max(this->_root); }
 
 		value_type&				at(const key_type& key) throw(std::out_of_range) // same as tree[N]
 		{
@@ -132,7 +129,7 @@ namespace ft {
 
 		//_5_Member_functions___________________________________________________________________________________________
 		//__Assignment_operator_____________________
-		Self&	operator=(const Self& other)
+		Self&					operator=(const Self& other)
 		{
 			if (this == &other)
 				;
@@ -154,7 +151,6 @@ namespace ft {
 		{
 			Clear(this->_root);
 			this->_root = nullptr;
-//			Clear(this->_end);
 			this->_end = nullptr;
 		}
 		//__Insert__________________________________________
@@ -184,28 +180,28 @@ namespace ft {
 		{
 			if (position == this->end())
 				return ;
-			Remove(this->_root, position.base());
-			nodePtr maxNode = Max(this->_root);
-			_end ? (_end->_parent = maxNode) : _end = ConstructEnd(maxNode);
-			if (maxNode == _root && !isEnd(_root))
-				maxNode->_right = _end;
-			else if (isEnd(_root))
-				_root->_parent = nullptr;
+			else if (position.base() == nullptr)
+				throw std::out_of_range("map/set<T> iterator");
+			erase(getKey(position));
 		}
 		size_type	erase(const key_type& key)
 		{
 			size_type	size = this->size();
-			nodePtr	node = Find(key, this->_root);
+			nodePtr		node = Find(key, this->_root);
+			nodePtr		maxNode;
+
 			if (node == this->end().base())
 				return size;
+
 			Remove(this->_root, node);
 
-			nodePtr maxNode = Max(this->_root);
+			maxNode = Max(this->_root);
 			_end ? (_end->_parent = maxNode) : _end = ConstructEnd(maxNode);
 			if (maxNode == _root && !isEnd(_root))
 				maxNode->_right = _end;
 			else if (isEnd(_root))
 				_root->_parent = nullptr;
+
 			return (size == this->size());
 		}
 		void		erase(iterator first, iterator last)
@@ -251,7 +247,18 @@ namespace ft {
 		//_8_Observers__________________________________________________________________________________________________
 		key_compare		key_comp() const	{ return _key_compare; }
 //		value_compare	value_comp() const	{ return _value_compare; }
-		void swap(Self &X) {(void)X;}
+		void			swap(Self &X) {
+			if (this->get_allocator() == X.get_allocator()) {
+				std::swap(_key_compare, X._key_compare);
+				std::swap(_root, X._root);
+				std::swap(_end, X._end);
+			}
+			else {
+				RedBlackTree<RedBlackTreeTraits> tmp = *this;
+				*this = X;
+				X = tmp;
+			}
+		}
 
 		void	print()
 		{
@@ -313,14 +320,16 @@ namespace ft {
 		}
 
 		static nodePtr		Min(const nodePtr& position) {
-			return !isEnd(position) && position != nullptr && !isEnd(position->_left) && position->_left ? Min(position->_left) : position;
+			return !isEnd(position) && position != nullptr && !isEnd(position->_left) && position->_left ?
+																				Min(position->_left) : position;
 		}
 
 		static nodePtr		Max(const nodePtr& position) {
-			return  !isEnd(position) && position != nullptr && !isEnd(position->_right) && position->_right ? Max(position->_right) : position;
+			return  !isEnd(position) && position != nullptr && !isEnd(position->_right) && position->_right ?
+																				Max(position->_right) : position;
 		}
 
-		static bool		isMax(const nodePtr& position) {
+		static bool			isMax(const nodePtr& position) {
 			nodePtr tmp = position;
 			while (tmp && tmp->_parent)
 				tmp = tmp->_parent;
@@ -328,7 +337,7 @@ namespace ft {
 			return (tmp == position);
 		}
 
-		static bool		isMin(const nodePtr& position) {
+		static bool			isMin(const nodePtr& position) {
 			nodePtr tmp = position;
 			while (tmp && tmp->_parent)
 				tmp = tmp->_parent;
@@ -336,13 +345,15 @@ namespace ft {
 			return (tmp == position);
 		}
 
-		static bool		isEnd(const nodePtr& position) {
+		static bool			isEnd(const nodePtr& position) {
 			return position && position->_data == nullptr;
 		}
 
 	protected:
 		void	rotateLeft(const nodePtr& node) {
 			nodePtr	rightChild = node->_right;
+			if (!rightChild)
+				return ;
 			node->_right = rightChild->_left;
 
 			if (node->_right)
@@ -362,6 +373,8 @@ namespace ft {
 
 		void	rotateRight(const nodePtr& node) {
 			nodePtr	leftChild = node->_left;
+			if (!leftChild)
+				return ;
 			node->_left = leftChild->_right;
 
 			if (node->_left)
@@ -445,16 +458,17 @@ namespace ft {
 				if (parent && parent->_left == node) {
 
 					otherNode = parent->_right;
-					if (otherNode->_color == Red) {
+					if (!isEnd(otherNode) && otherNode && otherNode->_color == Red) {
 						otherNode->_color = Black;
 						parent->_color = Red;
 						rotateLeft(parent);
 						otherNode = parent->_right;
 					}
-					else {
+					else if (!isEnd(otherNode) && otherNode) {
 
 						if (!otherNode->_right || otherNode->_right->_color == Black) {
-							otherNode->_left->_color = Black;
+							if (otherNode->_left)
+								otherNode->_left->_color = Black;
 							otherNode->_color = Red;
 							rotateRight(otherNode);
 							otherNode = parent->_right;
@@ -462,29 +476,33 @@ namespace ft {
 
 						otherNode->_color = parent->_color;
 						parent->_color = Black;
-						otherNode->_right->_color = Black;
+						if (otherNode->_right)
+							otherNode->_right->_color = Black;
 						rotateLeft(parent);
 						node = root;
 						break ;
 					}
+					else
+						break ;
 				}
 				else if (parent) {
 					otherNode = parent->_left;
-					if (otherNode->_color == Red) {
+					if (!isEnd(otherNode) && otherNode->_color == Red) {
 						otherNode->_color = Black;
 						parent->_color = Red;
 						rotateRight(parent);
 						otherNode = parent->_left;
 					}
-					if (!otherNode->_left || (otherNode->_left->_color == Black &&
+					if ((!isEnd(otherNode) && !otherNode->_left) || (otherNode->_left->_color == Black &&
 					(!otherNode->_right || otherNode->_right->_color == Black))) {
 						otherNode->_color = Red;
 						node = parent;
 						parent = node->_parent;
 					}
 					else {
-						if (!otherNode->_left || otherNode->_left->_color == Black) {
-							otherNode->_right->_color = Black;
+						if ((!isEnd(otherNode) && !otherNode->_left) || otherNode->_left->_color == Black) {
+							if (otherNode->_right)
+								otherNode->_right->_color = Black;
 							otherNode->_color = Red;
 							rotateLeft( otherNode);
 							otherNode = parent->_left;
@@ -501,7 +519,6 @@ namespace ft {
 			}
 			if (node)
 				node->_color = Black;
-//			this->_root = root;
 		}
 
 
@@ -545,7 +562,6 @@ namespace ft {
 			Clear(position->_left);
 			Clear(position->_right);
 			Destroy(position);
-			position = nullptr;
 		}
 
 		void	Destroy(nodePtr position)
@@ -559,6 +575,7 @@ namespace ft {
 			}
 			_allocator_node.destroy(position);
 			_allocator_node.deallocate(position, 1);
+			position = nullptr;
 		}
 
 		void	Copy(nodePtr& newNode, const nodePtr& otherNode)
@@ -590,18 +607,19 @@ namespace ft {
 
 		void	Remove(nodePtr root, nodePtr node) {
 
-			nodePtr	child, parent, replace;
-			bool	color;
+			nodePtr		child, parent, replace;
+			bool		color;
 
 			// если не является листом дерева
-			if (node->_left && node->_right) {
+			if (node->_left && node->_right && !isEnd(node->_left) && !isEnd(node->_right)) {
 
 				replace = node->_right;
-				while (replace->_left) // ищем замену в левом поддереве правого ребенка
+				while (replace->_left && !isEnd(replace->_left)) // ищем замену в левом поддереве правого ребенка
 					replace = replace->_left;
 
+				// ищем куда подставлять замену
 				if (node->_parent == nullptr) // если удаляем корень
-					root = replace;
+					this->_root = replace;
 				else { // если не корень
 					if (node->_parent->_left == node) // перекидываем указатель у родителя на замену
 						node->_parent->_left = replace;
@@ -627,7 +645,7 @@ namespace ft {
 				replace->_left = node->_left;
 				node->_left->_parent = replace;
 				if (color == Black)
-					fixRemove(root, child, parent);
+					fixRemove(this->_root, child, parent);
 				Destroy(node);
 				return ;
 			}
@@ -653,7 +671,6 @@ namespace ft {
 			if (color == Black)
 				fixRemove(root, child, parent);
 			Destroy(node);
-			this->_root = root;
 		}
 
 		nodePtr		Find(const key_type& key, const nodePtr& position) const {

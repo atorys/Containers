@@ -11,7 +11,8 @@ VPATH		=	./Sources/			\
 				./Tests/
 
 #------------------------------------------FILES
-SRCS_NAME	=	main.cpp
+SRCS_NAME	=	Tests/test_vector.cpp
+#SRCS_NAME	=	main.cpp
 #				test_map.cpp
 OBJS_NAME	=	$(SRCS_NAME:.cpp=.o)
 

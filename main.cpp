@@ -4,6 +4,7 @@
 
 #include "Tests/test_map.cpp"
 #include "Sources/set.hpp"
+#include <set>
 
 int main()
 {
@@ -84,11 +85,11 @@ int main()
 //		return v;
 
 //		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::less<int> > >::iterator it;
-////		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it2;
-//////		ft::pair<ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator, ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator> rt = tree2.equal_range(2);
-//		tree2.print();
+//////		ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator it2;
+////////		ft::pair<ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator, ft::RedBlackTree< ft::RedBlackTreeTraits< ft::pair<const int, int>, std::greater<int> > >::iterator> rt = tree2.equal_range(2);
+////		tree2.print();
 //		it = tree2.begin();
-////		it2 = tree.begin();
+//////		it2 = tree.begin();
 //		for (; it != tree2.end(); ++it) {
 //			std::cout << it->first << "\n";
 //		}
@@ -206,6 +207,7 @@ int main()
 //		{
 //			system("clear");
 //			set.print();
+//			std::cout << "		";
 //			std::cin >> input;
 //			if (input == -1)
 //				break ;
@@ -214,19 +216,29 @@ int main()
 //	}
 	{
 		ft::set<int> set;
-
 		set.insert(10);
-		set.insert(9);
-		set.insert(12);
+//		set.insert(9);
+//		set.insert(12);
 //		set.insert(11);
 //		set.insert(89);
 //		set.insert(78);
 //		set.insert(54);
 		set.print();
 		set.erase(10);
+//		set.erase(10);
 //		set.erase(11);
 		set.print();
+//		set.erase(set.begin(), --set.end());
+		set.print();
 	}
+//	{
+//		ft::map<int, int>	mp;
+//		for (int i = 0, j = 0; i < 50 * 1; ++i, ++j)
+//			mp.insert(ft::make_pair(i, j));
+//
+//		mp.print();
+//		mp.erase(mp.begin(), --mp.end());
+//	}
 
 //	while (1)
 //	{}

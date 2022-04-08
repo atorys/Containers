@@ -13,35 +13,33 @@
 
 namespace ft {
 
-	template < class Key, class Compare = std::less<Key>,
-			class Alloc = std::allocator<Key> >
-	class set : public ft::RedBlackTree< RedBlackTreeTraits < Key, Compare, Alloc > > {
+	template	< class Key, class Compare = std::less<Key>, class Alloc = std::allocator<Key> >
+	class	set : public ft::RedBlackTree< RedBlackTreeTraits < Key, Compare, Alloc > > {
 
 		typedef	ft::RedBlackTree< RedBlackTreeTraits < Key, Compare, Alloc > >	Container;
+		typedef set <Key, Compare, Alloc>										Self;
 
 	public:
 
 		//_1_Member_types_______________________________________________________________________________________________
 
-		typedef Key										keyType;
-		typedef Key										value_type;
-		typedef typename Alloc::template
-		rebind<value_type>::other						allocType;
-		typedef typename Alloc::template
-		rebind<value_type>::other::pointer				allocPtr;
-		typedef set <Key, Compare, Alloc>				Self;
-		typedef Key										type;
-		typedef Alloc									allocator;
-		typedef typename Alloc::size_type				size_type;
-		typedef typename Alloc::difference_type			difference_type;
-//		typedef typename Alloc::value_type				valueType;
-		typedef typename Alloc::pointer					pointer;
-		typedef typename Alloc::reference				reference;
-		typedef typename Alloc::const_pointer			const_pointer;
-		typedef typename Alloc::const_reference			const_reference;
+		typedef Key												key_type;
+		typedef Key												value_type;
+		typedef Alloc											allocator_type;
+		typedef Compare											key_compare;
+		typedef Compare											value_compare;
 
-		typedef typename Container::iterator			iterator;
-		typedef typename Container::const_iterator		const_iterator;
+		typedef typename Alloc::size_type						size_type;
+		typedef typename Alloc::difference_type					difference_type;
+		typedef typename Alloc::pointer							pointer;
+		typedef typename Alloc::reference						reference;
+		typedef typename Alloc::const_pointer					const_pointer;
+		typedef typename Alloc::const_reference					const_reference;
+
+		typedef typename Container::iterator					iterator;
+		typedef typename Container::const_iterator				const_iterator;
+		typedef typename Container::reverse_iterator			reverse_iterator;
+		typedef typename Container::const_reverse_iterator		const_reverse_iterator;
 
 		//_2_Constructors_______________________________________________________________________________________________
 
@@ -57,6 +55,9 @@ namespace ft {
 				this->insert(*first);
 		}
 		~set() { Container::clear(); }
+
+		//_3_Observers__________________________________________________________________________________________________
+		value_compare	value_comp() const	{ return (this->key_comp()); }
 
 	};
 }

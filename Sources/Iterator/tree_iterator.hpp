@@ -64,8 +64,12 @@ namespace ft {
 
 		Self&	operator++() // идем снизу вверх по дереву, от меньших элементов к большим
 		{
-			if (!_current || tree::isEnd(_current))
-				;
+			if (!_current || (tree::isEnd(_current) && _current->_parent)) {
+				if (_current && _current->_parent && !tree::isMax(_current->_parent))
+					_current = _current->_parent;
+				else
+					;
+			}
 			else if (tree::isMax(_current))
 				_current = _current->_right;
 			else if (_current->_right)// если есть узел справа, спускаемся в его левое поддерево

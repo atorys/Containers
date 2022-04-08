@@ -6,6 +6,7 @@
 #pragma once
 
 #include <memory>
+#include <iostream>
 #include "Iterator/iterator.hpp"
 #include "Iterator/iterator_category.hpp"
 #include "Iterator/random_access_iterator.hpp"
@@ -17,6 +18,7 @@
 #include "Utils/copy.hpp"
 #include "Utils/enable_if.hpp"
 #include "Utils/is_integral.hpp"
+#include "Utils/pair.hpp"
 
 namespace ft {
 
@@ -38,6 +40,7 @@ namespace ft {
 		//_1_Member_types_______________________________________________________________________________________________
 
 		typedef vector <Type, Alloc>					Self;
+		typedef Alloc									allocator_type;
 		typedef typename Alloc::size_type				size_type;
 		typedef typename Alloc::difference_type			difference_type;
 		typedef typename Alloc::value_type				value_type;
@@ -49,8 +52,8 @@ namespace ft {
 
 		typedef ft::random_access_iterator < RandIter <Type, difference_type, pointer, reference> >				iterator;
 		typedef ft::random_access_iterator < RandIter <Type, difference_type, const_pointer, const_reference> >	const_iterator;
-		typedef ft::reverse_iterator < iterator >															reverse_iterator;
-		typedef ft::reverse_iterator < const_iterator >														const_reverse_iterator;
+		typedef ft::reverse_iterator < iterator >																reverse_iterator;
+		typedef ft::reverse_iterator < const_iterator >															const_reverse_iterator;
 
 		//_2_Constructors_______________________________________________________________________________________________
 
@@ -62,10 +65,10 @@ namespace ft {
 				_last = Fill(_first, N, Type());
 		}
 
-		vector(size_type N, const Type& X) {
-			if (Buy(N))
-				_last = Fill(_first, N, X);
-		}
+//		vector(size_type N, const Type& X) {
+//			if (Buy(N))
+//				_last = Fill(_first, N, X);
+//		}
 		vector(size_type N, const Type& X, const Alloc& A = Alloc()) : _allocator(A)
 		{
 			if (Buy(N))
@@ -79,14 +82,16 @@ namespace ft {
 		}
 
 		template < class Iter >
-		vector(Iter first, Iter last, typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr)
+		vector(Iter first, Iter last, const Alloc& A = Alloc(),
+			   typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = nullptr): _allocator(A)
 		{
 			Buy(0);
 			insert(this->begin(), first, last);
 		}
 
 		template < class Iter >
-		vector(Iter first, Iter last, typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr)
+		vector(Iter first, Iter last, const Alloc& A = Alloc(),
+			   typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr): _allocator(A)
 		{
 			size_type N = (size_type)first;
 			if (Buy(N))
@@ -147,6 +152,8 @@ namespace ft {
 		const_reference				front() const					{ return *(this->begin()); }
 		reference 					back()							{ return *(this->end() - 1); } // *vector[last]
 		const_reference				back() const					{ return *(this->end() - 1); }
+		pointer 					data()							{ return _first; }
+		const_pointer				data() const					{ return _first; }
 
 		reference			at(size_type N) throw(std::out_of_range) // same as vector[N]
 		{
@@ -478,9 +485,9 @@ namespace ft {
 			return current;
 		};
 
-		void 	exception_length() const { throw std::length_error("vector too long"); };
-//		void 	exception_range() const { throw std::out_of_range("vector subscript"); };
-		void 	exception_range() const { throw std::out_of_range("vector"); };
+		void 	exception_length() const	{ throw std::length_error("vector too long"); };
+		void 	exception_range() const		{ throw std::out_of_range("vector subscript"); };
+//		void 	exception_range() const { throw std::out_of_range("vector"); };
 
 	};
 
