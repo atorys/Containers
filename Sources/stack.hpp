@@ -53,7 +53,7 @@ namespace ft {
 		void				pop()											{ _c.pop_back(); }
 		bool 				eq(const stack<Type, Container>& other) const	{ return (_c == other._c); }
 		bool 				less(const stack<Type, Container>& other) const	{ return (_c < other._c); }
-		void 				swap(const stack<Type, Container>& other)		{ _c.swap(other._c); }
+		void 				swap(stack<Type, Container>& other)				{ _c.swap(other._c); }
 	};
 
 	template < class Type, class C > inline

@@ -197,8 +197,8 @@ namespace ft {
 		};
 
 		//__Assign__________________________________
-		template <class Iter> // for integral Iter
-		void assign(Iter first, Iter last, typename ft::enable_if<ft::is_integral<Iter>::value>::type* = nullptr)
+		template <class Iter, class Iter2 > // for integral Iter
+		void assign(Iter first, Iter2 last, typename ft::enable_if<ft::is_integral<Iter2>::value>::type* = nullptr)
 		{
 			erase(this->begin(), this->end());
 			insert(this->begin(), (size_type)first, (Type)last);

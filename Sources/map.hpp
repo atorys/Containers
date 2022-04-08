@@ -55,7 +55,7 @@ namespace ft {
 		//_2_Constructors_______________________________________________________________________________________________
 
 		explicit	map(const Compare& comp = Compare(), const Alloc& allocator = Alloc()): Container(comp, allocator) {}
-		explicit	map(const Compare& comp): Container(comp, Alloc()) {}
+//		explicit	map(const Compare& comp): Container(comp, Alloc()) {}
 					map(const Self& other): Container(other) {}
 
 		template < class Iter >

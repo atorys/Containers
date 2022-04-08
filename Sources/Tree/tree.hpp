@@ -167,22 +167,23 @@ namespace ft {
 			maxNode->_right = _end;
 			return (ft::make_pair(iterator(newNode), true));
 		}
+
 		template < class Iter >
 		void						insert(Iter first, Iter last,
 		typename ft::enable_if<!ft::is_integral<Iter>::value >::type* = 0)
 		{
-			for (; first != last && !isEnd(first.base()); first++)
-				insert(*(first.base()->_data));
+			for (; first != last; first++)
+				insert(*first);
 		}
 
+
 		//__Erase___________________________________________
-		void 		erase(iterator position)
+		iterator	erase(iterator position)
 		{
-			if (position == this->end())
-				return ;
-			else if (position.base() == nullptr)
+			if (position.base() == nullptr)
 				throw std::out_of_range("map/set<T> iterator");
 			erase(getKey(position));
+			return (++position);
 		}
 		size_type	erase(const key_type& key)
 		{
@@ -204,10 +205,11 @@ namespace ft {
 
 			return (size == this->size());
 		}
-		void		erase(iterator first, iterator last)
+		iterator	erase(iterator first, iterator last)
 		{
 			for (; first != last; ++first)
 				erase(first);
+			return first;
 		}
 
 		//_7_LookUp_____________________________________________________________________________________________________
@@ -217,31 +219,31 @@ namespace ft {
 		bool 			contains(key_type const& key) const		{ return Find(key, this->_root) != nullptr; }
 
 		iterator		lower_bound(key_type const& key) {
-			iterator	it = begin();
-			for (; it != end() && _key_compare(getKey(it), key); ++it) {}
+			iterator	it = this->begin();
+			for (; it != this->end() && _key_compare(getKey(it), key); ++it) {}
 			return it;
 		}
 		iterator		upper_bound(key_type const& key) {
-			iterator	it = lower_bound(key);
-			return it != end() && this->getKey(it) == key ? ++it : it;
+			iterator	it = this->lower_bound(key);
+			return it != this->end() && this->getKey(it.base()) == key ? ++it : it;
 		}
 		const_iterator	lower_bound(key_type const& key) const {
-			const_iterator	it = begin();
-			for (; it != end() && _key_compare(getKey(it), key); ++it) {}
+			const_iterator	it = this->begin();
+			for (; it != this->end() && _key_compare(this->getKey(it.base()), key); ++it) {}
 			return it;
 		}
 		const_iterator	upper_bound(key_type const& key) const {
-			const_iterator	it = lower_bound(key);
-			return it != end() && getKey(it) == key ? ++it : it;
+			const_iterator	it = this->lower_bound(key);
+			return it != this->end() && this->getKey(it.base()) == key ? ++it : it;
 		}
 
 		ft::pair<iterator, iterator>				equal_range(key_type const& key) {
-			return ft::make_pair<iterator, iterator>(lower_bound(key), upper_bound(key));
+			return ft::make_pair<iterator, iterator>(this->lower_bound(key), this->upper_bound(key));
 		}
 		ft::pair<const_iterator, const_iterator>	equal_range(key_type const& key) const {
-			const_iterator	itLow = lower_bound(key);
-			const_iterator	itUp = upper_bound(key);
-			return ft::make_pair<const_iterator, const_iterator>(itLow, itUp);
+//			const_iterator	itLow = lower_bound(key);
+//			const_iterator	itUp = upper_bound(key);
+			return ft::make_pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
 		}
 
 		//_8_Observers__________________________________________________________________________________________________
