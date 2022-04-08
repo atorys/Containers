@@ -6,17 +6,19 @@ Implementation of container types of the C++ standard template library.
     `templates` 
     `dynamic memory reallocation`  
     `iterator system`
+    
 - **stack**  
     `based on vector`
+    
 - **map / set**  
     `based on dynamic structure - tree` `pair structure`  
-    `tree iterator system` `red black tree`
-
-#### Tree visualization :  
-
-<div>
-<img src="tree_insertion.gif" width=30% height=20%/>
-</div>
+    `tree iterator system`  
+    
+- **tree**   
+    `insertion` `deletion`
+    `find` `visualization` 
+    
+ <div> <img src="tree_insertion.gif" width=40% height=20%/> </div>
 
 ### Useful links
   - [RedBlack Tree insertion](https://www.geeksforgeeks.org/c-program-red-black-tree-insertion/)
