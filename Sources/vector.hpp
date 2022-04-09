@@ -12,13 +12,7 @@
 #include "Iterator/random_access_iterator.hpp"
 #include "Iterator/reverse_iterator.hpp"
 #include "Iterator/iterator_distance.hpp"
-#include "Utils/equal.hpp"
-#include "Utils/lexicographical_compare.hpp"
-#include "Utils/fill.hpp"
-#include "Utils/copy.hpp"
-#include "Utils/enable_if.hpp"
-#include "Utils/is_integral.hpp"
-#include "Utils/pair.hpp"
+#include "Utils/utility.hpp"
 
 namespace ft {
 

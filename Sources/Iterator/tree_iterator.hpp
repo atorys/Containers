@@ -22,7 +22,6 @@ namespace ft {
 													typename iterator_traits<BiDirIter>::reference >
 	{
 	public:
-//		typedef	typename ft::iterator_traits<BiDirIter>::pointer 			thisPtr;
 		typedef	typename ft::RedBlackTree<TreeTraits>::nodePtr 				thisPtr;
 		typedef typename ft::RedBlackTree<TreeTraits>						tree;
 		typedef typename TreeTraits::pointer								pointer;
@@ -64,16 +63,31 @@ namespace ft {
 
 		Self&	operator++() // идем снизу вверх по дереву, от меньших элементов к большим
 		{
-			if (!_current || (tree::isEnd(_current) && _current->_parent)) {
+//			if (!_current || (tree::isEnd(_current) && _current->_parent)) {
+//				if (_current && _current->_parent && !tree::isMax(_current->_parent))
+//					_current = _current->_parent;
+//				else
+//					;
+//			}
+
+//			if (!_current || (tree::isEnd(_current) && _current->_parent && !_current->_right)) {
+//				if (_current && _current->_parent && !tree::isMax(_current->_parent))
+//					_current = _current->_parent;
+//				else
+//					;
+//			}
+
+			if (!_current)
+				;
+			else if (tree::isEnd(_current) && !_current->_right) {
 				if (_current && _current->_parent && !tree::isMax(_current->_parent))
 					_current = _current->_parent;
 				else
 					;
 			}
-			else if (tree::isMax(_current))
+			else if (tree::isMax(_current) && tree::isEnd(_current->_right))
 				_current = _current->_right;
 			else if (_current->_right)// если есть узел справа, спускаемся в его левое поддерево
-//			else if (!tree::isEnd(_current->_right))// если есть узел справа, спускаемся в его левое поддерево
 				_current = tree::Min(_current->_right);
 			else { //если узла справа нет, поднимаемся до родителя и идем вверх, пока не окажемся в левом поддереве
 				thisPtr	parent = _current->_parent;
@@ -107,7 +121,6 @@ namespace ft {
 			}
 			else if (_current->_parent && tree::isMax(_current->_parent))
 				_current = _current->_parent;
-//			else if (!tree::isEnd(_current->_left) && _current->_left) // если есть узел слева, спускаемся в его правое поддерево
 			else if (_current->_left) // если есть узел слева, спускаемся в его правое поддерево
 				_current = tree::Max(_current->_left);
 			else { //если узла слева нет, поднимаемся до родителя и идем вверх, пока не окажемся в правом поддереве
@@ -144,7 +157,6 @@ namespace ft {
 														typename iterator_traits<BiDirIter>::reference >
 	{
 	public:
-//		typedef	typename ft::iterator_traits<BiDirIter>::pointer 			thisPtr;
 		typedef	typename ft::RedBlackTree<TreeTraits>::nodePtr 				thisPtr;
 		typedef typename ft::RedBlackTree<TreeTraits>						tree;
 		typedef typename TreeTraits::pointer								pointer;
@@ -186,11 +198,17 @@ namespace ft {
 
 		Self&	operator++() // идем снизу вверх по дереву, от меньших элементов к большим
 		{
-			if (!_current || tree::isEnd(_current))
+			if (!_current)
 				;
-			else if (tree::isMax(_current))
+			else if (tree::isEnd(_current) && !_current->_right) {
+				if (_current && _current->_parent && !tree::isMax(_current->_parent))
+					_current = _current->_parent;
+				else
+					;
+			}
+			else if (tree::isMax(_current) && tree::isEnd(_current->_right))
 				_current = _current->_right;
-			else if (!tree::isEnd(_current->_right))// если есть узел справа, спускаемся в его левое поддерево
+			else if (_current->_right)// если есть узел справа, спускаемся в его левое поддерево
 				_current = tree::Min(_current->_right);
 			else { //если узла справа нет, поднимаемся до родителя и идем вверх, пока не окажемся в левом поддереве
 				thisPtr	parent = _current->_parent;
@@ -224,7 +242,7 @@ namespace ft {
 			}
 			else if (_current->_parent && tree::isMax(_current->_parent))
 				_current = _current->_parent;
-			else if (!tree::isEnd(_current->_left) && _current->_left) // если есть узел слева, спускаемся в его правое поддерево
+			else if (_current->_left) // если есть узел слева, спускаемся в его правое поддерево
 				_current = tree::Max(_current->_left);
 			else { //если узла слева нет, поднимаемся до родителя и идем вверх, пока не окажемся в правом поддереве
 				thisPtr	parent = _current->_parent;

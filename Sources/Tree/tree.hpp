@@ -6,12 +6,8 @@
 
 #include <memory>
 #include "tree_node.hpp"
-#include "../Utils/pair.hpp"
 #include "tree_traits.hpp"
-#include "../Utils/enable_if.hpp"
-#include "../Utils/is_integral.hpp"
-#include "../Utils/equal.hpp"
-#include "../Utils/lexicographical_compare.hpp"
+#include "../Utils/utility.hpp"
 
 #define RED		"\033[31m"
 #define DEF		"\033[0m"
@@ -91,9 +87,7 @@ namespace ft {
 
 		//_3_Capacity___________________________________________________________________________________________________
 		size_type				size()	const			{ return Size(_root); }
-//		size_type				max_size()	const		{ return _allocator_node.max_size(); } // todo : ???????
-//		size_type				max_size()	const		{ return std::numeric_limits<size_type>::max(); } // todo : ???????
-		size_type				max_size()	const		{ return _allocator.max_size() / 2; } // todo : ???????
+		size_type				max_size()	const		{ return _allocator.max_size() / 2; }
 		bool 					empty() const			{ return (size() == 0); }
 		allocPair				get_allocator() const	{ return _allocator; }
 
@@ -109,18 +103,18 @@ namespace ft {
 
 		value_type&				at(const key_type& key) throw(std::out_of_range) // same as tree[N]
 		{
-			if (find(key) == this->end())
+			if (Find(key, this->_root) == this->_end)
 				throw std::out_of_range("out of range");
 			return getValue(Find(key, this->_root));
 		}
 		const value_type&		at(const key_type& key) const throw(std::out_of_range) // same as tree[N]
 		{
-			if (find(key) == this->end())
+			if (Find(key, this->_root) == this->_end)
 				throw std::out_of_range("out of range");
 			return getValue(Find(key, this->_root));
 		}
 
-		value_type&				operator[]( const key_type& key)
+		value_type&				operator[](const key_type& key)
 		{
 			if (find(key) == this->end())
 				insert(ft::make_pair(key, value_type()));
@@ -191,19 +185,21 @@ namespace ft {
 			nodePtr		node = Find(key, this->_root);
 			nodePtr		maxNode;
 
-			if (node == this->end().base())
-				return size;
+			if (node != this->_end) {
+				Remove(this->_root, node);
 
-			Remove(this->_root, node);
-
-			maxNode = Max(this->_root);
-			_end ? (_end->_parent = maxNode) : _end = ConstructEnd(maxNode);
-			if (maxNode == _root && !isEnd(_root))
-				maxNode->_right = _end;
-			else if (isEnd(_root))
-				_root->_parent = nullptr;
-
-			return (size == this->size());
+				maxNode = Max(this->_root);
+				_end ? (_end->_parent = maxNode) : _end = ConstructEnd(maxNode);
+				if (maxNode == _root && !isEnd(_root))
+					maxNode->_right = _end;
+				else if (isEnd(_root)) {
+					_root->_parent = nullptr;
+					clear();
+				}
+				else if (maxNode != _root)
+					maxNode->_right = _end;
+			}
+			return (size != this->size());
 		}
 		iterator	erase(iterator first, iterator last)
 		{
@@ -241,14 +237,11 @@ namespace ft {
 			return ft::make_pair<iterator, iterator>(this->lower_bound(key), this->upper_bound(key));
 		}
 		ft::pair<const_iterator, const_iterator>	equal_range(key_type const& key) const {
-//			const_iterator	itLow = lower_bound(key);
-//			const_iterator	itUp = upper_bound(key);
 			return ft::make_pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
 		}
 
 		//_8_Observers__________________________________________________________________________________________________
 		key_compare		key_comp() const	{ return _key_compare; }
-//		value_compare	value_comp() const	{ return _value_compare; }
 		void			swap(Self &X) {
 			if (this->get_allocator() == X.get_allocator()) {
 				std::swap(_key_compare, X._key_compare);
@@ -262,64 +255,50 @@ namespace ft {
 			}
 		}
 
-		void	print()
-		{
-			std::cout << "ROOT\n";
-			printNode(_end, _root, 0, false);
-			std::cout << "\n";
-		}
-
-		bool	check_left(nodePtr parent, int depth) {
-			nodePtr granny = parent;
-			nodePtr tmp;
-			while (granny && --depth) {
-				tmp = granny;
-				granny = granny->_parent;
-			}
-			return (granny && granny->_left == tmp);
-		}
-
-		void	printNode(nodePtr& parent, nodePtr& node, int depth, bool left)
-		{
-			if (depth) {
-				for (int i = 0; i < depth - 1; i++) {
-					if (check_left(parent, depth - i))
-						std::cout << "     ";
-					else if (parent != this->_root)
-						std::cout << " │  ";
-				}
-				if (parent) {
-					if (!left)
-						std::cout << " ├──";
-					else
-						std::cout << " └──";
-				}
-			}
-			if (isEnd(node) || !node) {
-				std::cout << "(null)\n" << DEF;
-				return;
-			}
-			if (node->_data) {
-				node->_color == Red ? std::cout << RED : std::cout << DEF;
-				std::cout << "(" << getKey(node) << ")\n" << DEF;
-			}
-			printNode(node, node->_right, depth + 1, false);
-			printNode(node, node->_left, depth + 1, true);
-		}
-
-		bool	getColor(const nodePtr& node) const
-		{
-			if (!node)
-				return Black;
-			return node->_color;
-		}
-
-		void	setColor(const nodePtr& node, bool color)
-		{
-			if (!node)
-				return ;
-			node->_color = color;
-		}
+//		void	print()
+//		{
+//			std::cout << "ROOT\n";
+//			printNode(_end, _root, 0, false);
+//			std::cout << "\n";
+//		}
+//
+//		bool	check_left(nodePtr parent, int depth) {
+//			nodePtr granny = parent;
+//			nodePtr tmp;
+//			while (granny && --depth) {
+//				tmp = granny;
+//				granny = granny->_parent;
+//			}
+//			return (granny && granny->_left == tmp);
+//		}
+//
+//		void	printNode(nodePtr& parent, nodePtr& node, int depth, bool left)
+//		{
+//			if (depth) {
+//				for (int i = 0; i < depth - 1; i++) {
+//					if (check_left(parent, depth - i))
+//						std::cout << "     ";
+//					else if (parent != this->_root)
+//						std::cout << " │  ";
+//				}
+//				if (parent) {
+//					if (!left)
+//						std::cout << " ├──";
+//					else
+//						std::cout << " └──";
+//				}
+//			}
+//			if (isEnd(node) || !node) {
+//				std::cout << "(null)\n" << DEF;
+//				return;
+//			}
+//			if (node->_data) {
+//				node->_color == Red ? std::cout << RED : std::cout << DEF;
+//				std::cout << "(" << getKey(node) << ")\n" << DEF;
+//			}
+//			printNode(node, node->_right, depth + 1, false);
+//			printNode(node, node->_left, depth + 1, true);
+//		}
 
 		static nodePtr		Min(const nodePtr& position) {
 			return !isEnd(position) && position != nullptr && !isEnd(position->_left) && position->_left ?
@@ -456,7 +435,7 @@ namespace ft {
 			if (node == nullptr || isEnd(node))
 				return;
 			nodePtr	otherNode;
-			while ((!node && !isEnd(node)) || (node->_color == Black && node != root)) {
+			while ((!node) || (node->_color == Black && node != this->_root)) { // todo: !isEnd(node)
 				if (parent && parent->_left == node) {
 
 					otherNode = parent->_right;
@@ -685,6 +664,20 @@ namespace ft {
 
 		size_type	Size(const nodePtr& position) const {
 			return !isEnd(position) && position ? Size(position->_right) + Size(position->_left) + 1 : 0 ;
+		}
+
+		bool	getColor(const nodePtr& node) const
+		{
+			if (!node)
+				return Black;
+			return node->_color;
+		}
+
+		void	setColor(const nodePtr& node, bool color)
+		{
+			if (!node)
+				return ;
+			node->_color = color;
 		}
 
 		static key_type&				getKey(nodePtr position)			{ return RedBlackTreeTraits::GetKey(position); }
